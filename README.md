@@ -1,2 +1,2 @@
-# sawtooth-simplebank
-A simple sawtooth "simplebank" transaction family (processor + client)
+# sawtooth-simplewallet
+A simple sawtooth "simplewallet" transaction family (processor + client)
