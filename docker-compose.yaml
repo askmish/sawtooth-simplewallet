@@ -65,21 +65,6 @@ services:
         --connect tcp://validator:4004
         --bind sawtooth-rest-api:8008
 
-  sawtooth-shell:
-    image: hyperledger/sawtooth-shell:1.0
-    volumes:
-      - '.:/project/simplewallet'
-    working_dir: /project/simplewallet
-    container_name: sawtooth-shell
-    depends_on:
-      - sawtooth-rest-api
-    entrypoint: |
-      bash -c "
-        if [ ! -f /root/.sawtooth/keys/root.priv ]; then
-        sawtooth keygen
-        fi;
-        tail -f /dev/null
-      "
   settings-tp:
     image: hyperledger/sawtooth-settings-tp:1.0
     depends_on:
