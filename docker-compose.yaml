@@ -17,6 +17,7 @@ version: '2.1'
 
 services:
   simplewallet-processor:
+    container_name: simplewallet-processor
     build:
       context: .
       dockerfile: ./processor/Dockerfile
@@ -30,6 +31,7 @@ services:
       - '.:/project/simplewallet/'
 
   simplewallet-client:
+    container_name: simplewallet-client
     build:
       context: .
       dockerfile: ./pyclient/Dockerfile
@@ -50,6 +52,7 @@ services:
     stop_signal: SIGKILL
 
   sawtooth-rest-api:
+    container_name: rest-api
     image: hyperledger/sawtooth-rest-api:1.0
     expose:
       - 8008
@@ -84,6 +87,7 @@ services:
     command: settings-tp -vv --connect tcp://validator:4004
 
   validator:
+    container_name: validator
     image: hyperledger/sawtooth-validator:1.0
     expose:
       - 4004

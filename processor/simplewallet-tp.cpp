@@ -38,7 +38,7 @@ static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger
 
 static const std::string SIMPLE_WALLET_NAMESPACE = "simplewallet";
 
-#define URL_DEFAULT "tcp://validator_1:4004"
+#define URL_DEFAULT "tcp://validator:4004"
 
 
 // Helper function to generate an SHA512 hash and return it as a hex

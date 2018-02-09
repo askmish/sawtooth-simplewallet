@@ -29,7 +29,7 @@ from wallet.simplewallet_exceptions import SimpleWalletException
 
 DISTRIBUTION_NAME = 'simplewallet'
 
-DEFAULT_URL = 'http://simplewallet_sawtooth-rest-api_1:8008'
+DEFAULT_URL = 'http://rest-api:8008'
 
 def create_console_handler(verbose_level):
     clog = logging.StreamHandler()
