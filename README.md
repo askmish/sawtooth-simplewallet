@@ -38,10 +38,14 @@ docker exec -it simplewallet-client bash
 You can locate the right docker client container name using `docker ps`.
 
 Sample command usage:
-sawtooth keygen jack <--- This creates the public/private keys, a pre-requisite for all commands following
-./simplewallet deposit 100 jack <--- This adds the 100 amount to Jack's state address
-./simplewallet withdraw 50 jack <--- Withdraws 50 from Jack's state address
-./simplewallet balance jack <--- Displays the balance left in Jack's account
+
+sawtooth keygen jack #This creates the public/private keys, a pre-requisite for all commands following
+
+./simplewallet deposit 100 jack #This adds the 100 amount to Jack's state address
+
+./simplewallet withdraw 50 jack #Withdraws 50 units from Jack's state address
+
+./simplewallet balance jack #Displays the balance left in Jack's account
 
 # License
 This example and Hyperledger Sawtooth software are licensed under the [Apache License Version 2.0](LICENSE) software license.
