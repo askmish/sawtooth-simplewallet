@@ -32,7 +32,7 @@ At this point all the containers should have been built and running.
 
 To launch the client, you could do this:
 ```bash
-docker exec -it simplewallet-client_1 bash
+docker exec -it simplewallet-client bash
 ```
 
 You can locate the right docker client container name using `docker ps`.
