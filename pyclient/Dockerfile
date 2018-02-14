@@ -64,20 +64,8 @@ RUN echo "deb http://repo.sawtooth.me/ubuntu/ci xenial universe" >> /etc/apt/sou
     python3-yarl=0.10.0-1 \
     python3-zmq \
     software-properties-common \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* \
- && pip3 install \
-    pylint \
-    pycodestyle --upgrade
-
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
- && add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) \
-         stable"
-
-RUN apt-get update && apt-get install -y -q \
-    docker-ce python3-sawtooth-sdk python3-sawtooth-cli \
+    python3-sawtooth-sdk \
+    python3-sawtooth-cli \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
