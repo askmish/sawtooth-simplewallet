@@ -83,6 +83,8 @@ RUN apt-get update && apt-get install -y -q \
 
 WORKDIR /project/simplewallet/pyclient
 
+ENV PATH "$PATH:/project/simplewallet/pyclient"
+
 EXPOSE 3000
 
 CMD unset PYTHONPATH && python3 setup.py clean --all && python3 setup.py build
