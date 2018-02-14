@@ -42,13 +42,14 @@ services:
     environment:
       - 'http_proxy=${http_proxy}'
       - 'https_proxy=${https_proxy}'
+      - 'no_proxy=rest-api,validator,{no_proxy}'
     volumes:
       - '.:/project/simplewallet/'
     ports:
       - '0.0.0.0:3000:3000'
     depends_on:
       - sawtooth-rest-api
-    entrypoint: "bash -c \"sawtooth keygen sawtooth && tail -f /dev/null\""
+    entrypoint: "bash -c \"sawtooth keygen --force sawtooth && tail -f /dev/null\""
     stop_signal: SIGKILL
 
   sawtooth-rest-api:
