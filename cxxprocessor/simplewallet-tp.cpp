@@ -71,13 +71,13 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 // Helper function: To extract Action str and value integer from given string
 void strToActionAndValue(const std::string& str, std::string& action, uint32_t& value) {
      std::vector<std::string> vs = split(str, ','); 
-     if (vs.size() != 3) {
+     if (vs.size() != 2) {
          std::string error = "invalid no. of arguments: expected 2, got:"
              + std::to_string(vs.size()) + "\n";
          throw sawtooth::InvalidTransaction(error);
      } 
-     action = vs[1];
-     value = std::stoi(vs[2]);
+     action = vs[0];
+     value = std::stoi(vs[1]);
 }
 
 // Handles the processing of SimpleWallet transactions
@@ -94,7 +94,6 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             sawtooth::TransactionHeaderSignerPublicKey);
 
         const std::string& raw_data = this->txn->payload();
-        std::string customerName;
         std::string action;
         uint32_t value;
 

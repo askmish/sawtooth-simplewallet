@@ -40,6 +40,6 @@ RUN \
 
 EXPOSE 4004/tcp
 
-WORKDIR /project/simplewallet/processor
+WORKDIR /project/simplewallet/cxxprocessor
 
 CMD bash -c "./build.sh"

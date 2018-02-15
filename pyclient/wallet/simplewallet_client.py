@@ -71,22 +71,19 @@ class SimpleWalletClient:
         self._address = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
             _hash(self._publicKey.encode('utf-8'))[0:64]
 
-    def deposit(self, customerName, value):
+    def deposit(self, value):
         return self._wrap_and_send(
-            customerName,
             "deposit",
             value)
 
-    def withdraw(self, customerName, value):
+    def withdraw(self, value):
         return self._wrap_and_send(
-            customerName,
             "withdraw",
             value)
 
-    def balance(self, customerName):
+    def balance(self):
         result = self._send_to_restapi(
-            "state/{}".format(self._address),
-            customerName=customerName)
+            "state/{}".format(self._address))
         try:
             return base64.b64decode(yaml.safe_load(result)["data"])
 
@@ -96,8 +93,7 @@ class SimpleWalletClient:
     def _send_to_restapi(self,
                       suffix,
                       data=None,
-                      contentType=None,
-                      customerName=None):
+                      contentType=None):
         if self._baseUrl.startswith("http://"):
             url = "{}/{}".format(self._baseUrl, suffix)
         else:
@@ -128,12 +124,11 @@ class SimpleWalletClient:
         return result.text
 
     def _wrap_and_send(self,
-                     customerName,
                      action,
                      value):
 
         # Generate a csv utf-8 encoded string as payload
-        payload = ",".join([customerName, action, str(value)]).encode()
+        payload = ",".join([action, str(value)]).encode()
 
         # Construct the address where we'll store our state
         address = self._address

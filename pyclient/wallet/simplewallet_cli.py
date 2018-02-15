@@ -134,29 +134,26 @@ def create_parser(prog_name):
     return parser
 
 def _get_keyfile(args):
-    customerName = getpass.getuser() if args.customerName is None else args.customerName
     home = os.path.expanduser("~")
     key_dir = os.path.join(home, ".sawtooth", "keys")
 
-    return '{}/{}.priv'.format(key_dir, customerName)
+    return '{}/{}.priv'.format(key_dir, args.customerName)
 
 def do_deposit(args):
-
     keyfile = _get_keyfile(args)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
 
-    response = client.deposit(args.customerName, args.value)
+    response = client.deposit(args.value)
 
     print("Response: {}".format(response))
 
 def do_withdraw(args):
-
     keyfile = _get_keyfile(args)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
 
-    response = client.withdraw(args.customerName, args.value)
+    response = client.withdraw(args.value)
 
     print("Response: {}".format(response))
     
@@ -165,12 +162,12 @@ def do_balance(args):
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
 
-    data = client.balance(args.customerName)
+    data = client.balance()
 
     if data is not None:
-        print("Net balance = {}".format(data.decode()))
+        print("\n{} has a net balance of = {}\n".format(args.customerName, data.decode()))
     else:
-        raise SimpleWalletException("Data not found: {}".format(customerName))
+        raise SimpleWalletException("Data not found: {}".format(args.customerName))
 
 def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     if args is None:
