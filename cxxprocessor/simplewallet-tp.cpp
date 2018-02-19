@@ -90,7 +90,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 
     void Apply() {
         std::cout << "SimpleWalletApplicator::Apply\n";
-        std::string key = this->txn->header()->GetValue(
+        std::string wallet_user_pubkey = this->txn->header()->GetValue(
             sawtooth::TransactionHeaderSignerPublicKey);
 
         const std::string& raw_data = this->txn->payload();
@@ -101,9 +101,9 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
         std::cout << "Got: " << action << " and " << value << "\n";
 
         if (action == "deposit") {
-            this->makeDeposit(key, value);
+            this->makeDeposit(wallet_user_pubkey, value);
         } else if (action == "withdraw") {
-            this->doWithdraw(key, value);
+            this->doWithdraw(wallet_user_pubkey, value);
         } else {
             std::string error = "invalid action: '" + action + "'";
             throw sawtooth::InvalidTransaction(error);
@@ -111,17 +111,19 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     }
 
  private:
-    std::string MakeAddress(const std::string& key) {
+    std::string MakeAddress(const std::string& wallet_user_pubkey) {
         return SHA512(SIMPLE_WALLET_NAMESPACE).substr(0, 6) +
-            SHA512(key).substr(0, 64);
+            SHA512(wallet_user_pubkey).substr(0, 64);
     }
 
     // Handle the SimpleWallet Deposit action
     // overflow and underflow cases are ignored for this example
-    void makeDeposit(const std::string& key, const uint32_t& value) {
+    void makeDeposit(const std::string& wallet_user_pubkey,
+                     const uint32_t& value) {
 
-        auto address = this->MakeAddress(key);
-        LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::makeDeposit Key: " << key
+        auto address = this->MakeAddress(wallet_user_pubkey);
+        LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::makeDeposit Key: "
+            << wallet_user_pubkey
             << " Address: " << address);
 
         uint32_t stored_value = 0;
@@ -143,11 +145,13 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     }
 
     // Handle SimpleWallet Withdraw action.
-    void doWithdraw(const std::string& key, const uint32_t& value) {
+    void doWithdraw(const std::string& wallet_user_pubkey,
+                    const uint32_t& value) {
 
-        auto address = this->MakeAddress(key);
+        auto address = this->MakeAddress(wallet_user_pubkey);
 
-        LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::doWithdraw Key: " << key
+        LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::doWithdraw Key: "
+            << wallet_user_pubkey
             << " Address: " << address);
 
         uint32_t stored_value = 0;
@@ -157,7 +161,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             stored_value = std::stoi(stored_value_str);
         } else {
             std::string error = "Action was 'withdraw', but address"
-                " not found in state for Key: " + key;
+                " not found in state for Key: " + wallet_user_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
 
@@ -165,7 +169,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             stored_value -= value;
         } else {
             std::string error = "You don't have any sufficient balance"
-                " to withdraw." + key;
+                " to withdraw." + wallet_user_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
 
