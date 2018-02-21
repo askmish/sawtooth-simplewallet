@@ -134,6 +134,10 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             if (stored_value_str.length() != 0) {
                 stored_value = std::stoi(stored_value_str);
             }
+        } else {
+            std::cout << "\nThis is the first time we got a deposit."
+                << "\nCreating a new account for user: "
+                << wallet_user_pubkey << std::endl;
         }
 
         stored_value += value;
