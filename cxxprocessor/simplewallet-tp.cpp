@@ -60,7 +60,7 @@ std::vector<std::string> split(const std::string& str, char delimiter)
    std::istringstream strStream(str);
    std::string token;
    std::vector<std::string> tokens;
-   
+
    while (std::getline(strStream, token, delimiter))
    {
       tokens.push_back(token);
@@ -70,18 +70,22 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 
 // Helper function: To extract Action str and value integer from given string
 void strToActionAndValue(const std::string& str, std::string& action, uint32_t& value) {
-     std::vector<std::string> vs = split(str, ','); 
+     std::vector<std::string> vs = split(str, ',');
      if (vs.size() != 2) {
          std::string error = "invalid no. of arguments: expected 2, got:"
              + std::to_string(vs.size()) + "\n";
          throw sawtooth::InvalidTransaction(error);
-     } 
+     }
      action = vs[0];
      value = std::stoi(vs[1]);
 }
 
-// Handles the processing of SimpleWallet transactions
-// This is the place where you implement your TF logic
+/*******************************************************************************
+ * SimpleWalletApplicator
+ *
+ * Handles the processing of SimpleWallet transactions
+ * This is the place where you implement your TF logic
+ ******************************************************************************/
 class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  public:
     SimpleWalletApplicator(sawtooth::TransactionUPtr txn,
@@ -90,16 +94,22 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 
     void Apply() {
         std::cout << "SimpleWalletApplicator::Apply\n";
+        // Extract user's wallet public key from TransactionHeader
         std::string wallet_user_pubkey = this->txn->header()->GetValue(
             sawtooth::TransactionHeaderSignerPublicKey);
 
+        // Extract the payload from Transaction as a string
         const std::string& raw_data = this->txn->payload();
+
         std::string action;
         uint32_t value;
 
+        // Extract the action and value from the payload string
         strToActionAndValue(raw_data, action, value);
         std::cout << "Got: " << action << " and " << value << "\n";
 
+
+        // Choose what to do with value, based on action
         if (action == "deposit") {
             this->makeDeposit(wallet_user_pubkey, value);
         } else if (action == "withdraw") {
@@ -111,6 +121,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     }
 
  private:
+    // Make a 70-byte address to store and retrieve the state
     std::string MakeAddress(const std::string& wallet_user_pubkey) {
         return SHA512(SIMPLE_WALLET_NAMESPACE).substr(0, 6) +
             SHA512(wallet_user_pubkey).substr(0, 64);
@@ -121,6 +132,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     void makeDeposit(const std::string& wallet_user_pubkey,
                      const uint32_t& value) {
 
+        // Generate the unique state address based on user's wallet public key
         auto address = this->MakeAddress(wallet_user_pubkey);
         LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::makeDeposit Key: "
             << wallet_user_pubkey
@@ -129,22 +141,27 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
         uint32_t stored_value = 0;
         std::string stored_value_str;
 
+        // Get the value stored at the state address for this wallet user
         if (this->state->GetState(&stored_value_str, address)) {
             std::cout << "Stored value: " << stored_value_str << "\n";
             if (stored_value_str.length() != 0) {
                 stored_value = std::stoi(stored_value_str);
             }
         } else {
+            // If the state address doesn't exist we create a new account
             std::cout << "\nThis is the first time we got a deposit."
                 << "\nCreating a new account for user: "
                 << wallet_user_pubkey << std::endl;
         }
 
+        // This is the TF business logic:
+        // Increment stored value by deposit value extracted from txn payload
+        LOG4CXX_DEBUG(logger, "Storing value: " << value << " units");
         stored_value += value;
 
-        // encode the value map back to string for storage.
-        LOG4CXX_DEBUG(logger, "Storing " << value << " units");
         stored_value_str = std::to_string(stored_value);
+
+        // Store the updated value in the user's unique state address
         this->state->SetState(address, stored_value_str);
     }
 
@@ -184,8 +201,14 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     }
 };
 
-// Define the SimpleWallet Handler to register with the transaction processor
-// It sets the versions and types of transactions that can be handled
+/*******************************************************************************
+ * SimpleWalletHandler
+ *
+ * This class will be registered as the transaction processor handler
+ * with validator
+ * It sets the namespaceprefix, versions and types of transactions
+ * that can be handled by this TP
+ ******************************************************************************/
 class SimpleWalletHandler: public sawtooth::TransactionHandler {
 
 public:
@@ -258,25 +281,25 @@ int main(int argc, char** argv) {
 
         // Set up a simple configuration that logs on the console.
         BasicConfigurator::configure();
-        
+
         // Set logging verbosity to max
         logger->setLevel(Level::getAll());
 
         // Create a transaction processor
 
-        // connect to validator at connectToValidatorUrl
+        // 1. connect to validator at connectToValidatorUrl
         sawtooth::TransactionProcessorUPtr processor(
             sawtooth::TransactionProcessor::Create(connectToValidatorUrl));
 
-        // create a transaction handler for our SimpleWallet TF
+        // 2. create a transaction handler for our SimpleWallet TF
         sawtooth::TransactionHandlerUPtr transaction_handler(
             new SimpleWalletHandler());
 
-        // register the transaction handler with validator
+        // 3. register the transaction handler with validator
         processor->RegisterHandler(
             std::move(transaction_handler));
 
-        // run the transaction processor
+        // 4. run the transaction processor
         processor->Run();
 
         return 0;
