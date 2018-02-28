@@ -20,11 +20,15 @@ services:
     container_name: simplewallet-processor
     build:
       context: .
-      dockerfile: ./cxxprocessor/Dockerfile
+      dockerfile: ./javaprocessor/Dockerfile
       args:
         - http_proxy
         - https_proxy
         - no_proxy
+    environment:
+      - 'http_proxy=${http_proxy}'
+      - 'https_proxy=${https_proxy}'
+      - 'no_proxy=rest-api,validator,{no_proxy}'
     depends_on:
       - validator
     volumes:
