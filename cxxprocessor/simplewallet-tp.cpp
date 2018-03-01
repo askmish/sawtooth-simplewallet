@@ -36,7 +36,7 @@ using namespace log4cxx;
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger
     ("SimpleWallet"));
 
-static const std::string SIMPLE_WALLET_NAMESPACE = "simplewallet";
+static const std::string SIMPLEWALLET_FAMILY = "simplewallet";
 
 #define DEFAULT_VALIDATOR_URL "tcp://validator:4004"
 
@@ -123,7 +123,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  private:
     // Make a 70-byte address to store and retrieve the state
     std::string MakeAddress(const std::string& wallet_user_pubkey) {
-        return SHA512(SIMPLE_WALLET_NAMESPACE).substr(0, 6) +
+        return SHA512(SIMPLEWALLET_FAMILY).substr(0, 6) +
             SHA512(wallet_user_pubkey).substr(0, 64);
     }
 
@@ -214,12 +214,12 @@ class SimpleWalletHandler: public sawtooth::TransactionHandler {
 public:
     //Generating a namespace prefix in the default constructor
     SimpleWalletHandler() {
-        this->namespacePrefix = SHA512(SIMPLE_WALLET_NAMESPACE).substr(0, 6);
+        this->namespacePrefix = SHA512(SIMPLEWALLET_FAMILY).substr(0, 6);
         LOG4CXX_DEBUG(logger, "namespace:" << this->namespacePrefix);
     }
 
     std::string transaction_family_name() const {
-        return std::string(SIMPLE_WALLET_NAMESPACE);
+        return std::string(SIMPLEWALLET_FAMILY);
     }
 
     std::list<std::string> versions() const {
