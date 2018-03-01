@@ -170,9 +170,6 @@ class SimpleWalletClient:
         #Create a Batch List from Batch above
         batch_list = BatchList(batches=[batch])
 
-        # Create a batch id
-        # batch_id = batch_list.batches[0].header_signature
-
         # Send batch_list to rest-api
         return self._send_to_restapi(
             "batches",
