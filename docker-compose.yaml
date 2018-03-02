@@ -1,0 +1,82 @@
+# Copyright 2018 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ------------------------------------------------------------------------------
+
+version: '2.1'
+
+services:
+  simplewallet-processor:
+    container_name: simplewallet-processor
+    image: askmish/sawtooth-simplewallet-tp-cxx:latest
+    depends_on:
+      - validator
+    volumes:
+      - '.:/project/simplewallet/'
+
+  simplewallet-client:
+    container_name: simplewallet-client
+    image: askmish/sawtooth-simplewallet-client-python:latest
+    environment:
+      - 'http_proxy=${http_proxy}'
+      - 'https_proxy=${https_proxy}'
+      - 'no_proxy=rest-api,validator,{no_proxy}'
+    volumes:
+      - '.:/project/simplewallet/'
+    ports:
+      - '0.0.0.0:3000:3000'
+    depends_on:
+      - sawtooth-rest-api
+    entrypoint: "bash -c \"sawtooth keygen --force sawtooth && tail -f /dev/null\""
+    stop_signal: SIGKILL
+
+  sawtooth-rest-api:
+    container_name: rest-api
+    image: hyperledger/sawtooth-rest-api:1.0
+    expose:
+      - 8008
+    ports:
+      - '8008:8008'
+    depends_on:
+      - validator
+    entrypoint: |
+      sawtooth-rest-api -vvv
+        --connect tcp://validator:4004
+        --bind sawtooth-rest-api:8008
+
+  settings-tp:
+    image: hyperledger/sawtooth-settings-tp:1.0
+    depends_on:
+      - validator
+    command: settings-tp -vv --connect tcp://validator:4004
+
+  validator:
+    container_name: validator
+    image: hyperledger/sawtooth-validator:1.0
+    expose:
+      - 4004
+    ports:
+      - '4040:4004'
+    command: |
+      bash -c "
+        if [ ! -f /etc/sawtooth/keys/validator.priv ]; then
+        sawadm keygen &&
+        sawtooth keygen my_key &&
+        sawset genesis -k /root/.sawtooth/keys/my_key.priv &&
+        sawadm genesis config-genesis.batch
+        fi;
+        sawtooth-validator -vvv \
+          --endpoint tcp://validator:8800 \
+          --bind component:tcp://eth0:4004 \
+          --bind network:tcp://eth0:8800
+      "
