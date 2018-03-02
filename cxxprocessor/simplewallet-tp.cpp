@@ -114,14 +114,17 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             this->makeDeposit(wallet_user_pubkey, value);
         } else if (action == "withdraw") {
             this->doWithdraw(wallet_user_pubkey, value);
-        } else {
-            std::string error = "invalid action: '" + action + "'";
+        }
+        // Add your own action and a corresponding handler here
+        // Also add the actions in the client app as well
+        else {
+            std::string error = "Invalid action: '" + action + "'";
             throw sawtooth::InvalidTransaction(error);
         }
     }
 
  private:
-    // Make a 70-byte address to store and retrieve the state
+    // Make a 70-character(35-byte) address to store and retrieve the state
     std::string MakeAddress(const std::string& wallet_user_pubkey) {
         return SHA512(SIMPLEWALLET_FAMILY).substr(0, 6) +
             SHA512(wallet_user_pubkey).substr(0, 64);
@@ -155,7 +158,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
         }
 
         // This is the TF business logic:
-        // Increment stored value by deposit value extracted from txn payload
+        // Increment stored value by deposit value, extracted from txn payload
         LOG4CXX_DEBUG(logger, "Storing value: " << value << " units");
         stored_value += value;
 
