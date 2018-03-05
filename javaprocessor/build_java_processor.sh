@@ -26,14 +26,14 @@ git fetch --all
 git checkout 1-0
 echo "Building sawtooth java sdk dependecncy.."
 cd sdk/java
-mvn install -Dhttp.proxyHost=$http_proxy_host \
+mvn clean install -Dhttp.proxyHost=$http_proxy_host \
     -Dhttp.proxyPort=$http_proxy_port \
     -Dhttps.proxyHost=$https_proxy_host \
     -Dhttps.proxyPort=$https_proxy_port
 
 echo "Build Simplewallet java transaction processor.."
 cd $current_dir
-mvn install \
+mvn clean install \
     -Dhttp.proxyHost=$http_proxy_host \
     -Dhttp.proxyPort=$http_proxy_port \
     -Dhttps.proxyHost=$https_proxy_host \
