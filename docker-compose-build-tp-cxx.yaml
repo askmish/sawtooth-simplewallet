@@ -18,7 +18,13 @@ version: '2.1'
 services:
   simplewallet-processor:
     container_name: simplewallet-processor
-    image: askmish/sawtooth-simplewallet-tp-cxx:latest
+    build:
+      context: .
+      dockerfile: ./cxxprocessor/Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
     depends_on:
       - validator
     volumes:
@@ -26,7 +32,13 @@ services:
 
   simplewallet-client:
     container_name: simplewallet-client
-    image: askmish/sawtooth-simplewallet-client-python:latest
+    build:
+      context: .
+      dockerfile: ./pyclient/Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
     environment:
       - 'http_proxy=${http_proxy}'
       - 'https_proxy=${https_proxy}'

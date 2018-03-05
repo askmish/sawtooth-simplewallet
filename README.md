@@ -22,13 +22,12 @@ The application is built in two parts:
 
 This example uses docker-compose and docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
 
-Start the docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
+Start the pre-built docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
 ```bash
 cd sawtooth-simplewallet
-docker-compose up --build
+docker-compose up
 ```
-
-At this point all the containers should have been built and running.
+At this point all the containers should be running.
 
 To launch the client, you could do this:
 ```bash
@@ -39,6 +38,7 @@ You can locate the right docker client container name using `docker ps`.
 
 Sample command usage:
 
+```bash
 sawtooth keygen jack #This creates the public/private keys, a pre-requisite for all commands following
 
 simplewallet deposit 100 jack #This adds the 100 amount to Jack's state address
@@ -46,6 +46,14 @@ simplewallet deposit 100 jack #This adds the 100 amount to Jack's state address
 simplewallet withdraw 50 jack #Withdraws 50 units from Jack's state address
 
 simplewallet balance jack #Displays the balance left in Jack's account
+```
+
+# Building containers
+To build cxx tp code from cxxprocessor directory and run the simplewallet example:
+
+```bash
+docker-compose docker-compose-build-tp-cxx.yaml up --build
+```
 
 # License
 This example and Hyperledger Sawtooth software are licensed under the [Apache License Version 2.0](LICENSE) software license.

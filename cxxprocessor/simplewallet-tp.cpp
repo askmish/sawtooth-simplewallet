@@ -209,8 +209,8 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  *
  * This class will be registered as the transaction processor handler
  * with validator
- * It sets the namespaceprefix, versions and types of transactions
- * that can be handled by this TP
+ * It sets the namespaceprefix, versions, TF and types of transactions
+ * that can be handled by this TP - via the apply method
  ******************************************************************************/
 class SimpleWalletHandler: public sawtooth::TransactionHandler {
 
@@ -243,44 +243,10 @@ private:
     std::string namespacePrefix;
 };
 
-
-void usage(bool doExit = false, int exitCode = 1) {
-
-    std::cout << "Usage" << std::endl;
-    std::cout << "simple-wallet-tp [options] [connect_string]" << std::endl;
-    std::cout << "  -h, --help - print this message" << std::endl;
-
-    std::cout <<
-    "  connect_string - connect string to validator in format tcp://host:port"
-    << std::endl;
-
-    if (doExit) {
-        exit(exitCode);
-    }
-}
-
-void parseArgs(int argc, char** argv, std::string& connectToValidatorUrl) {
-
-    for (int i = 1; i < argc; i++) {
-        const std::string arg = argv[i];
-
-        if (arg == "-h" || arg == "--help") {
-            usage(true, 0);
-        } else if (i != (argc - 1)) {
-            std::cout << "Invalid command line argument:" << arg << std::endl;
-            usage(true);
-        } else {
-            connectToValidatorUrl = arg;
-        }
-    }
-}
-
 int main(int argc, char** argv) {
 
     try {
-        std::string connectToValidatorUrl = DEFAULT_VALIDATOR_URL;
-
-        parseArgs(argc, argv, connectToValidatorUrl);
+        const std::string connectToValidatorUrl = DEFAULT_VALIDATOR_URL;
 
         // Set up a simple configuration that logs on the console.
         BasicConfigurator::configure();
