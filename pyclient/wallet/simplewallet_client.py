@@ -71,6 +71,11 @@ class SimpleWalletClient:
         self._address = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
             _hash(self._publicKey.encode('utf-8'))[0:64]
 
+    # For each valid cli commands in _cli.py file
+    # Add methods to:
+    # 1. Do any additional handling, if required
+    # 2. Create a transaction and a batch
+    # 2. Send to rest-api
     def deposit(self, value):
         return self._wrap_and_send(
             "deposit",

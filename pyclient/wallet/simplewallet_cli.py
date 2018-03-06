@@ -179,6 +179,7 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
 
     setup_loggers(verbose_level=verbose_level)
 
+    # Get the commands from cli args and call corresponding handlers
     if args.command == 'deposit':
         do_deposit(args)
     elif args.command == 'withdraw':
