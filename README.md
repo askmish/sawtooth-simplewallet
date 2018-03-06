@@ -52,10 +52,10 @@ simplewallet balance jack #Displays the balance left in Jack's account
 To build TP code of your preferred language and run the simplewallet example:
 
 ```bash
-docker-compose docker-compose-build-tp-<your_prog_language>.yaml up --build
+docker-compose -f simplewallet-build-tp-<your_prog_language>.yaml up --build
 ```
 where,
- <your_prog_language> should be replaced with either cxx or java
+ <your_prog_language> should be replaced with either `cxx` or `java`
 
 # License
 This example and Hyperledger Sawtooth software are licensed under the [Apache License Version 2.0](LICENSE) software license.
