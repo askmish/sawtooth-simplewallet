@@ -22,6 +22,10 @@ The application is built in two parts:
 
 This example uses docker-compose and docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
 
+NOTE
+The preferred OS environment is Ubuntu 16.04.3 LTS x64.
+If you have windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
+
 Start the pre-built docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
 ```bash
 cd sawtooth-simplewallet
