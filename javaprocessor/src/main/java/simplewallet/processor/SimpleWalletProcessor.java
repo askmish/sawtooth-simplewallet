@@ -64,20 +64,31 @@ class SimpleWalletHandler implements TransactionHandler {
 	    System.exit(1);
 	}
     }
+    
+    /*
+     * apply()
+     *
+     * This method is invoked for each transaction the validator
+     * gets from the client
+     * 
+     * @param: request - contains the transaction
+     *                   
+     * @param: stateInfo - contains the state context
+     *
+     * @returns: void
+     *
+     * @throws: InvalidTransactionException, InternalError
+     *
+     */
 
     @Override
     public void apply(TpProcessRequest request, State stateInfo) throws InvalidTransactionException, InternalError {
-	/* This method is invoked by validator to 
-	   perform actual business logic and do ledger state manipulation
-	   Here we calling to operations like deposit and withdraw 
-	 */
-
-	/* Get operation request from payload data, we are passing operation name(deposit, withdraw)
-	 * and amount in the payload from the client. */
-
+        // Extract the payload as utf8 str from the transaction, in request var
 	String payload =  request.getPayload().toStringUtf8();
+
+        // Split the csv utf-8 string
 	ArrayList<String> payloadList = new ArrayList<>(Arrays.asList(payload.split(",")));
-	if(payloadList.size() != 2) {
+	if (payloadList.size() != 2) {
 	    throw new InvalidTransactionException("Invalid no. of arguments: expected 2, got:" + payloadList.size());
 	}
 	// First argument from payload is operation name
@@ -120,16 +131,31 @@ class SimpleWalletHandler implements TransactionHandler {
 	return txnFamilyName;
     }
 
+   /*
+    * makeDeposit()
+    *
+    * @param stateInfo - contains the state(the merkle tree), 
+    *
+    * @param amount - the amount to add to user's wallet
+    *
+    * @param userKey - the wallet user's public key
+    *
+    * @returns - void
+    *
+    * @throws - InvalidTransactionException, InternalError
+    *
+    */
+
     private void makeDeposit(State stateInfo, String operation, Integer amount, String userKey)
 	    throws InvalidTransactionException, InternalError {
-	//Get the wallet key from the signer public key
+	// Get the wallet key derived from the wallet user's public key
 	String walletKey = getWalletKey(userKey);
 	logger.info("Got user key " + userKey + "wallet key " + walletKey);
-	//Get balance from ledger state
+	// Get balance from ledger state
 	Map<String, ByteString> currentLedgerEntry = stateInfo.getState(Collections.singletonList(walletKey));
 	String balance = currentLedgerEntry.get(walletKey).toStringUtf8();
 	Integer newBalance = 0;
-	// getState() will return empty map if won't able to find the walletkey in state store
+	// getState() will return empty map if wallet key doesn't exist in state
 	if (balance.isEmpty()) {
 	    logger.info("This is the first time we got a deposit for user.");
 	    logger.info("Creating a new account for the user: " + userKey);
@@ -142,17 +168,33 @@ class SimpleWalletHandler implements TransactionHandler {
 	Map.Entry<String, ByteString> entry = new AbstractMap.SimpleEntry<String, ByteString>(walletKey,
 		ByteString.copyFromUtf8(newBalance.toString()));
 	Collection<Map.Entry<String, ByteString>> newLedgerEntry = Collections.singletonList(entry);
-	logger.info("Crediting balance with " + amount);
+	logger.info("Depositing amount: " + amount);
 	stateInfo.setState(newLedgerEntry);
     }
 
+   /*
+    * doWithdraw()()
+    *
+    * @param stateInfo - contains the state(the merkle tree), 
+    *
+    * @param amount - the amount to deduct from user's wallet
+    *
+    * @param userKey - the wallet user's public key
+    *
+    * @returns - void
+    *
+    * @throws - InvalidTransactionException, InternalError
+    *
+    */
     private void makeWithdraw(State stateInfo, String operation, Integer amount, String userKey)
 	    throws InvalidTransactionException, InternalError {
+	// Get the wallet key derived from the wallet user's public key
 	String walletKey = getWalletKey(userKey);
 	logger.info("Got user key " + userKey + "wallet key "+ walletKey);
-	//Get balance from ledger state
+	// Get balance from ledger state
 	Map<String, ByteString> currentLedgerEntry = stateInfo.getState(Collections.singletonList(walletKey));
 	String balance = currentLedgerEntry.get(walletKey).toStringUtf8();
+	// getState() will return empty map if wallet key doesn't exist in state
 	if (balance.isEmpty()) {
 	    String error = "Didn't find the wallet key associated with user key " + userKey;
 	    throw new InvalidTransactionException(error);
@@ -167,12 +209,13 @@ class SimpleWalletHandler implements TransactionHandler {
 	Map.Entry<String, ByteString> entry = new AbstractMap.SimpleEntry<String, ByteString>(walletKey,
 		ByteString.copyFromUtf8(updateBalance.toString()));
 	Collection<Map.Entry<String, ByteString>> newLedgerEntry = Collections.singletonList(entry);
-	logger.info("Debitting balance with " + amount);
+	logger.info("Withdrawing amount: " + amount);
 	stateInfo.setState(newLedgerEntry);
     }
 
     private String getWalletKey(String userKey) {
-	//Generate unique key(wallet key) from the wallet namespace and user signer key
+	// Generate unique key(wallet key) from the wallet namespace
+        // and user signer public key
 	return Utils.hash512(txnFamilyName.getBytes()).substring(0, 6)
 		+ Utils.hash512(userKey.getBytes()).substring(0, 64);
     }
