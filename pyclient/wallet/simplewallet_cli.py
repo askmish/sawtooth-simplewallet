@@ -97,6 +97,27 @@ def add_balance_parser(subparsers, parent_parser):
         'customerName',
         type=str,
         help='the name of customer to withdraw from')
+        
+def add_transfer_parser(subparsers, parent_parser):
+    parser = subparsers.add_parser(
+        'transfer',
+        help='transfers balance from one account to the other',
+        parents=[parent_parser])
+        
+    parser.add_argument(
+        'value',
+        type=int,
+        help='the amount to withdraw')
+        
+    parser.add_argument(
+        'customerNameFrom',
+        type=str,
+        help='the name of customer to withdraw from')
+
+    parser.add_argument(
+        'customerNameTo',
+        type=str,
+        help='the name of customer to deposit to')
 
 def create_parent_parser(prog_name):
     parent_parser = argparse.ArgumentParser(prog=prog_name, add_help=False)
@@ -130,17 +151,24 @@ def create_parser(prog_name):
     add_deposit_parser(subparsers, parent_parser)
     add_withdraw_parser(subparsers, parent_parser)
     add_balance_parser(subparsers, parent_parser)
+    add_transfer_parser(subparsers, parent_parser)
 
     return parser
 
-def _get_keyfile(args):
+def _get_keyfile(customerName):
     home = os.path.expanduser("~")
     key_dir = os.path.join(home, ".sawtooth", "keys")
 
-    return '{}/{}.priv'.format(key_dir, args.customerName)
+    return '{}/{}.priv'.format(key_dir, customerName)
+    
+def _get_pubkeyfile(customerName):
+    home = os.path.expanduser("~")
+    key_dir = os.path.join(home, ".sawtooth", "keys")
+
+    return '{}/{}.pub'.format(key_dir, customerName)
 
 def do_deposit(args):
-    keyfile = _get_keyfile(args)
+    keyfile = _get_keyfile(args.customerName)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
 
@@ -149,7 +177,7 @@ def do_deposit(args):
     print("Response: {}".format(response))
 
 def do_withdraw(args):
-    keyfile = _get_keyfile(args)
+    keyfile = _get_keyfile(args.customerName)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
 
@@ -158,7 +186,7 @@ def do_withdraw(args):
     print("Response: {}".format(response))
     
 def do_balance(args):
-    keyfile = _get_keyfile(args)
+    keyfile = _get_keyfile(args.customerName)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
 
@@ -168,6 +196,15 @@ def do_balance(args):
         print("\n{} has a net balance of = {}\n".format(args.customerName, data.decode()))
     else:
         raise SimpleWalletException("Data not found: {}".format(args.customerName))
+
+def do_transfer(args):
+    keyfileFrom = _get_keyfile(args.customerNameFrom)
+    keyfileTo = _get_pubkeyfile(args.customerNameTo)
+    
+    clientFrom = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfileFrom)
+
+    response = clientFrom.transfer(args.value, keyfileTo)
+    print("Response: {}".format(response))
 
 def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     if args is None:
@@ -186,6 +223,8 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
         do_withdraw(args)
     elif args.command == 'balance':
         do_balance(args)
+    elif args.command == 'transfer':
+        do_transfer(args)
     else:
         raise SimpleWalletException("invalid command: {}".format(args.command))
 

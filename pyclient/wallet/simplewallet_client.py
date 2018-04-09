@@ -82,9 +82,30 @@ class SimpleWalletClient:
             value)
 
     def withdraw(self, value):
-        return self._wrap_and_send(
+        try:
+            retValue = self._wrap_and_send(
             "withdraw",
             value)
+            #raise SimpleWalletException('Encountered an error during withdrawal {}'.format(retValue) )
+        except Exception as e:
+            raise SimpleWalletException('Encountered an error during withdrawal')
+        return retValue
+    
+    def transfer(self, value, clientToKey):
+        try:
+            with open(clientToKey) as fd:
+                publicKeyStr = fd.read().strip()
+            retValue = self._wrap_and_send(
+            "transfer",
+            value,
+            publicKeyStr)
+        except OSError as err:
+            raise SimpleWalletException(
+                'Failed to read public key {}: {}'.format( \
+                    clientToKey, str(err)))
+        except Exception as e:
+            raise SimpleWalletException('Encountered an error during transfer',e)
+        return retValue
 
     def balance(self):
         result = self._send_to_restapi(
@@ -130,21 +151,34 @@ class SimpleWalletClient:
 
     def _wrap_and_send(self,
                      action,
-                     value):
+                     *values):
 
         # Generate a csv utf-8 encoded string as payload
-        payload = ",".join([action, str(value)]).encode()
+        rawPayload = action
+        
+        for val in values:
+            rawPayload = ",".join([rawPayload, str(val)])
+                
+        payload = rawPayload.encode()
 
         # Construct the address where we'll store our state
         address = self._address
+        inputAddressList = [address]
+        outputAddressList = [address]
         
+        if "transfer" == action:
+            toAddress = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
+            _hash(values[1].encode('utf-8'))[0:64]
+            inputAddressList.append(toAddress)
+            outputAddressList.append(toAddress)
+       
         # Create a TransactionHeader
         header = TransactionHeader(
             signer_public_key=self._publicKey,
             family_name=FAMILY_NAME,
             family_version="1.0",
-            inputs=[address],
-            outputs=[address],
+            inputs=inputAddressList,
+            outputs=outputAddressList,
             dependencies=[],
             payload_sha512=_hash(payload),
             batcher_public_key=self._publicKey,

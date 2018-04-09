@@ -88,8 +88,8 @@ class SimpleWalletHandler implements TransactionHandler {
 
         // Split the csv utf-8 string
 	ArrayList<String> payloadList = new ArrayList<>(Arrays.asList(payload.split(",")));
-	if (payloadList.size() != 2) {
-	    throw new InvalidTransactionException("Invalid no. of arguments: expected 2, got:" + payloadList.size());
+	if(payloadList.size() != 2 && !(payloadList.size() == 3 && "transfer".equals(payloadList.get(0)))) {
+	    throw new InvalidTransactionException("Invalid no. of arguments: expected 2 or 3, got:" + payloadList.size());
 	}
 	// First argument from payload is operation name
 	String operation = payloadList.get(0);
@@ -107,7 +107,9 @@ class SimpleWalletHandler implements TransactionHandler {
 	    /* Add here you custom operation to perform and make changes in client as well
 	     * pass the corresponding operation name in the payload.
 	     * */
-
+	case "transfer":
+		makeTransfer(stateInfo, operation, amount, payloadList.get(2), userKey);
+		break;
 	default:
 	    String error = "Unsupported operation " + operation;
 	    throw new InvalidTransactionException(error);
@@ -173,7 +175,7 @@ class SimpleWalletHandler implements TransactionHandler {
     }
 
    /*
-    * doWithdraw()()
+    * makeWithdraw()
     *
     * @param stateInfo - contains the state(the merkle tree), 
     *
@@ -211,6 +213,65 @@ class SimpleWalletHandler implements TransactionHandler {
 	Collection<Map.Entry<String, ByteString>> newLedgerEntry = Collections.singletonList(entry);
 	logger.info("Withdrawing amount: " + amount);
 	stateInfo.setState(newLedgerEntry);
+    }
+    
+    /*
+    * maketransfer()
+    *
+    * @param stateInfo - contains the state(the merkle tree), 
+    *
+    * @param transferAmount - the amount to transfer from 1st user's wallet to second users's wallet
+    *
+    * @param userToKey - the public key of the user to whose wallet amount is to be tranferred
+    *
+    * @param userFromKey - the public key of the user from whose wallet amount is to be tranferred
+    *
+    * @returns - void
+    *
+    * @throws - InvalidTransactionException, InternalError
+    *
+    */
+    private void makeTransfer(State stateInfo, String operation, Integer transferAmount, String userToKey, String userFromKey)
+	    throws InvalidTransactionException, InternalError {
+	
+	String walletKeyFrom = getWalletKey(userFromKey);
+	String walletKeyTo = getWalletKey(userToKey);
+	
+	//Get and validate balance from ledger state for debtor 
+	Map<String, ByteString> currentLedgerEntry = stateInfo.getState(Arrays.asList(new String[]{walletKeyFrom,walletKeyTo}));
+	String balance = currentLedgerEntry.get(walletKeyFrom).toStringUtf8();
+	if (balance.isEmpty()) {
+	    throw new InvalidTransactionException("Didn't find the wallet key associated with user key " + userFromKey);
+	}
+	Integer debtorBalance = Integer.valueOf(balance);
+	if (debtorBalance < transferAmount) {
+	    throw new InvalidTransactionException("Transfer amount should be lesser than or equal to " + debtorBalance);
+	}
+	
+	//Get and validate balance from ledger state for creditor 
+	balance = currentLedgerEntry.get(walletKeyTo).toStringUtf8();
+	if (balance.isEmpty()) {
+	    throw new InvalidTransactionException("Didn't find the wallet key associated with user key " + userToKey);
+	}
+	Integer creditorBalance = Integer.valueOf(balance);
+	
+	// Update balance of debtor
+	Integer updateBalance = debtorBalance - transferAmount;
+	Map.Entry<String, ByteString> entry = new AbstractMap.SimpleEntry<String, ByteString>(walletKeyFrom,
+		ByteString.copyFromUtf8(updateBalance.toString()));
+	Collection<Map.Entry<String, ByteString>> newLedgerEntry = Collections.singletonList(entry);
+	logger.info("Debitting balance with " + transferAmount);
+	stateInfo.setState(newLedgerEntry);
+	
+	//Crediting to creditor
+	// Update balance of creditor
+	updateBalance = creditorBalance + transferAmount; 
+	entry = new AbstractMap.SimpleEntry<String, ByteString>(walletKeyTo,
+		ByteString.copyFromUtf8(updateBalance.toString()));
+	newLedgerEntry = Collections.singletonList(entry);
+	logger.info("Crediting to balance with " + transferAmount);
+	stateInfo.setState(newLedgerEntry);
+	
     }
 
     private String getWalletKey(String userKey) {
