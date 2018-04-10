@@ -58,10 +58,13 @@ sawtooth keygen jill #This creates the public/private keys for Jill, a pre-requi
 
 simplewallet deposit 100 jill #This adds 100 units to Jill's account
 
-simplewallet balance jack #Displays the balance left in Jill's account
+simplewallet balance jill #Displays the balance left in Jill's account
 
-#Transfer money from Jack to Jill
-simplewallet transfer 100 jack jill
+simplewallet transfer 25 jack jill #Transfer 25 units money from Jack to Jill
+
+simplewallet balance jack #Displays the balance left in Jack's account
+
+simplewallet balance jill #Displays the balance left in Jill's account
 
 ```
 
