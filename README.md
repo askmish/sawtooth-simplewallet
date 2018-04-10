@@ -9,8 +9,9 @@ A customer can:
 1. deposit money into his/her bank account.
 2. withdraw money from his/her bank account.
 3. check the balance in the account.
+4. transfer money from one bank account to another
 
-The customer is identified by a customer name and a corresponding public key. The value of the wallet, i.e. the balance, is stored at an address derived from hash of customer's public key and the transaction family namespace. To keep code simple, this example has been written for just one customer, one account.
+The customer is identified by a customer name and a corresponding public key. The value of the wallet, i.e. the balance, is stored at an address derived from hash of customer's public key and the transaction family namespace.
 
 # Components 
 The application is built in two parts:
@@ -43,13 +44,25 @@ You can locate the right docker client container name using `docker ps`.
 Sample command usage:
 
 ```bash
-sawtooth keygen jack #This creates the public/private keys, a pre-requisite for all commands following
+#Create a wallet
+sawtooth keygen jack #This creates the public/private keys for Jill, a pre-requisite for all commands following
 
-simplewallet deposit 100 jack #This adds the 100 amount to Jack's state address
+simplewallet deposit 100 jack #This adds 100 units to Jack's account
 
-simplewallet withdraw 50 jack #Withdraws 50 units from Jack's state address
+simplewallet withdraw 50 jack #Withdraws 50 units from Jack's account
 
 simplewallet balance jack #Displays the balance left in Jack's account
+
+#Create 2nd wallet
+sawtooth keygen jill #This creates the public/private keys for Jill, a pre-requisite for all commands following
+
+simplewallet deposit 100 jill #This adds 100 units to Jill's account
+
+simplewallet balance jack #Displays the balance left in Jill's account
+
+#Transfer money from Jack to Jill
+simplewallet transfer 100 jack jill
+
 ```
 
 # Building containers
