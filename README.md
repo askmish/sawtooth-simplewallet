@@ -3,7 +3,7 @@ A simple sawtooth "simplewallet" transaction family example (processor + client)
 
 # simplewallet
 
-This is a minimal example of a sawtooth 1.0 application. This example demonstrates, a common usecase, where a customer deposits/withdraws money from an account, based on private key.
+This is a minimal example of a sawtooth 1.0 application. This example demonstrates, a common usecase, where a customer deposits/withdraws/transfers money from an account, based on public key.
 
 A customer can:
 1. deposit money into his/her bank account.
