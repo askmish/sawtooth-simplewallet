@@ -77,5 +77,16 @@ docker-compose -f simplewallet-build-tp-<your_prog_language>.yaml up --build
 where,
  <your_prog_language> should be replaced with either `cxx` or `java`
 
+# Contributing
+Currently, we're looking for contributions and PRs for following:
+ - TPs using JS, GO, .NET, Python sawtooth SDKs
+ - Client apps in JS, GO, .NET, C++, JAVA
+
+More ways you can contribute:
+ - Bugs or issues: Report problems or defects found when working with simplewallet
+ - Core features and enhancements: Provide expanded capabilities or optimizations
+ - Documentation: Improve existing documentation or create new information
+ - Tests: Add functional, performance, or scalability tests
+
 # License
 This example and Hyperledger Sawtooth software are licensed under the [Apache License Version 2.0](LICENSE) software license.
