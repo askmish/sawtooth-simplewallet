@@ -50,18 +50,25 @@ class SWTransactionHandler(TransactionHandler):
     def apply(self, transaction, context):
 
         header = transaction.header
-        signer = header.signer_public_key
 
-        operation, amount = transaction.payload.decode().split(",")
-
+        payload_list = transaction.payload.decode().split(",")
+        
+        operation = payload_list[0]
+        
+        amount = payload_list[1]
+        
+        to_key = payload_list[2]
+        
+        from_key = header.signer_public_key
+        
         if operation == "deposit":
-            _make_deposit(context, operation, amount)
+            _make_deposit(context, operation, amount, from_key)
 
         if operation == "withdraw":
-            _make_withdraw(context, operation, amount)
+            _make_withdraw(context, operation, amount, from_key)
 
         if operation == "transfer":
-            _make_transfer(context, operation, amount, from_key, to_key)
+            _make_transfer(context, operation, amount, to_key, from_key)
 
 
 def _make_deposit(self, context, operation, amount):
