@@ -16,10 +16,6 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <iostream>
-#include <string>
-#include <sstream>
-
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
 #include <log4cxx/level.h>
@@ -31,10 +27,18 @@
 #include <cryptopp/filters.h>
 #include <cryptopp/hex.h>
 
+#include <iostream>
+#include <string>
+#include <sstream>
+
+#include <utility>
+#include <list>
+#include <vector>
+
 using namespace log4cxx;
 
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger
-    ("SimpleWallet"));
+    ("simplewallet"));
 
 static const std::string SIMPLEWALLET_FAMILY = "simplewallet";
 
@@ -55,25 +59,23 @@ static std::string sha512(const std::string& message) {
 }
 
 // Helper function: Tokenize std::string based on a delimiter
-std::vector<std::string> split(const std::string& str, char delimiter)
-{
-   std::istringstream strStream(str);
-   std::string token;
-   std::vector<std::string> tokens;
+std::vector<std::string> split(const std::string& str, char delimiter) {
+    std::istringstream strStream(str);
+    std::string token;
+    std::vector<std::string> tokens;
 
-   while (std::getline(strStream, token, delimiter))
-   {
-      tokens.push_back(token);
-   }
-   return tokens;
+    while (std::getline(strStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
 }
 
 // Helper function: To extract Action str and value integer from given string
 // and beneficiary string if available
 void strToActionValueAndBeneficiary(const std::string& str,
-                                    std::string& action,
-                                    uint32_t& value,
-                                    std::string& beneficiary) {
+                                    std::string* action,
+                                    uint32_t* value,
+                                    std::string* beneficiary) {
      std::vector<std::string> vs = split(str, ',');
 
      if (vs.size() == 2) {
@@ -100,7 +102,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  public:
     SimpleWalletApplicator(sawtooth::TransactionUPtr txn,
         sawtooth::GlobalStateUPtr state) :
-        TransactionApplicator(std::move(txn), std::move(state)) { };
+        TransactionApplicator(std::move(txn), std::move(state)) { }
 
     void Apply() {
         std::cout << "SimpleWalletApplicator::Apply\n";
@@ -151,7 +153,6 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     // overflow and underflow cases are ignored for this example
     void makeDeposit(const std::string& wallet_user_pubkey,
                      const uint32_t& value) {
-
         // Generate the unique state address based on user's wallet public key
         auto address = this->MakeAddress(wallet_user_pubkey);
         LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::makeDeposit Key: "
@@ -188,7 +189,6 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     // Handle SimpleWallet Withdraw action.
     void doWithdraw(const std::string& wallet_user_pubkey,
                     const uint32_t& value) {
-
         auto address = this->MakeAddress(wallet_user_pubkey);
 
         LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::doWithdraw Key: "
@@ -198,7 +198,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
         uint32_t stored_value = 0;
         std::string stored_value_str;
 
-        if(this->state->GetState(&stored_value_str, address)) {
+        if (this->state->GetState(&stored_value_str, address)) {
             stored_value = std::stoi(stored_value_str);
         } else {
             std::string error = "Action was 'withdraw', but address"
@@ -224,7 +224,6 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     void doTransfer(const std::string& customer_pubkey,
                     const uint32_t& request_amount,
                     const std::string& beneficiary_pubkey) {
-
         // Get the global state address for each user's account
         // based on respective pubkeys
         auto customer_state_address = this->MakeAddress(customer_pubkey);
@@ -243,7 +242,8 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 
         // Retrieve the balance available for customer account
         uint32_t customer_available_balance = 0;
-        if(this->state->GetState(&stored_balance_str, customer_state_address)) {
+        if (this->state->GetState(&stored_balance_str,
+                                  customer_state_address)) {
              customer_available_balance = std::stoi(stored_balance_str);
         } else {
             // The customer account hasn't been created yet
@@ -252,20 +252,24 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             throw sawtooth::InvalidTransaction(error);
         }
 
-        // Retrieve the balance available for beneficiary account 
+        // Retrieve the balance available for beneficiary account
         uint32_t beneficiary_available_balance = 0;
-        if(this->state->GetState(&stored_balance_str, beneficiary_state_address)) {
+        if (this->state->GetState(&stored_balance_str,
+                                  beneficiary_state_address)) {
              beneficiary_available_balance = std::stoi(stored_balance_str);
         } else {
             // The beneficiary account hasn't been created yet
             std::string error = "Action was 'transfer', but address"
-                " not found in state for beneficiary Key: " + beneficiary_pubkey;
+                " not found in state for beneficiary Key: "
+                + beneficiary_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
 
-        // Verify if customer has sufficient balance to transfer requested amount
+        // Verify if customer has sufficient balance
+        // to transfer requested amount
         if (customer_available_balance < request_amount) {
-            std::string error = "Insufficient balance. Can't transfer from customer: "
+            std::string error = "Insufficient balance."
+                                " Can't transfer from customer: "
                                 + customer_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
@@ -296,9 +300,8 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  * that can be handled by this TP - via the apply method
  ******************************************************************************/
 class SimpleWalletHandler: public sawtooth::TransactionHandler {
-
-public:
-    //Generating a namespace prefix in the default constructor
+ public:
+    // Generating a namespace prefix in the default constructor
     SimpleWalletHandler() {
         this->namespacePrefix = sha512(SIMPLEWALLET_FAMILY).substr(0, 6);
         LOG4CXX_DEBUG(logger, "namespace:" << this->namespacePrefix);
@@ -322,12 +325,12 @@ public:
         return sawtooth::TransactionApplicatorUPtr(
             new SimpleWalletApplicator(std::move(txn), std::move(state)));
     }
-private:
+
+ private:
     std::string namespacePrefix;
 };
 
 int main(int argc, char** argv) {
-
     try {
         const std::string connectToValidatorUrl = DEFAULT_VALIDATOR_URL;
 
