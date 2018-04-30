@@ -73,9 +73,9 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 // Helper function: To extract Action str and value integer from given string
 // and beneficiary string if available
 void strToActionValueAndBeneficiary(const std::string& str,
-                                    std::string* action,
-                                    uint32_t* value,
-                                    std::string* beneficiary) {
+                                    std::string& action,
+                                    uint32_t& value,
+                                    std::string& beneficiary) {
      std::vector<std::string> vs = split(str, ',');
 
      if (vs.size() == 2) {
