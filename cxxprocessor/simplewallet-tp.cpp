@@ -107,7 +107,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     void Apply() {
         std::cout << "SimpleWalletApplicator::Apply\n";
         // Extract user's wallet public key from TransactionHeader
-        std::string wallet_user_pubkey = this->txn->header()->GetValue(
+        std::string customer_pubkey = this->txn->header()->GetValue(
             sawtooth::TransactionHeaderSignerPublicKey);
 
         // Extract the payload from Transaction as a string
@@ -127,12 +127,12 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 
         // Choose what to do with value, based on action
         if (action == "deposit") {
-            this->makeDeposit(wallet_user_pubkey, value);
+            this->makeDeposit(customer_pubkey, value);
         } else if (action == "withdraw") {
-            this->doWithdraw(wallet_user_pubkey, value);
+            this->doWithdraw(customer_pubkey, value);
         } else if (action == "transfer") {
             std::cout << "Got beneficiary: " << beneficiary_pubkey << "\n";
-            this->doTransfer(wallet_user_pubkey, value, beneficiary_pubkey);
+            this->doTransfer(customer_pubkey, value, beneficiary_pubkey);
         }
         // Add your own action and a corresponding handler here
         // Also add the actions in the client app as well
@@ -144,80 +144,86 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 
  private:
     // Make a 70-character(35-byte) address to store and retrieve the state
-    std::string MakeAddress(const std::string& wallet_user_pubkey) {
+    std::string MakeAddress(const std::string& customer_pubkey) {
         return sha512(SIMPLEWALLET_FAMILY).substr(0, 6) +
-            sha512(wallet_user_pubkey).substr(0, 64);
+            sha512(customer_pubkey).substr(0, 64);
     }
 
     // Handle the SimpleWallet Deposit action
     // overflow and underflow cases are ignored for this example
-    void makeDeposit(const std::string& wallet_user_pubkey,
-                     const uint32_t& value) {
+    void makeDeposit(const std::string& customer_pubkey,
+                     const uint32_t& request_amount) {
         // Generate the unique state address based on user's wallet public key
-        auto address = this->MakeAddress(wallet_user_pubkey);
+        auto address = this->MakeAddress(customer_pubkey);
         LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::makeDeposit Key: "
-            << wallet_user_pubkey
+            << customer_pubkey
             << " Address: " << address);
 
-        uint32_t stored_value = 0;
-        std::string stored_value_str;
+        std::string stored_balance_str;
+
+        uint32_t customer_available_balance = 0;
 
         // Get the value stored at the state address for this wallet user
-        if (this->state->GetState(&stored_value_str, address)) {
-            std::cout << "Stored value: " << stored_value_str << "\n";
-            if (stored_value_str.length() != 0) {
-                stored_value = std::stoi(stored_value_str);
+        if (this->state->GetState(&stored_balance_str, address)) {
+            std::cout << "Available balance: " << stored_balance_str << "\n";
+            if (stored_balance_str.length() != 0) {
+                customer_available_balance = std::stoi(stored_balance_str);
             }
         } else {
             // If the state address doesn't exist we create a new account
             std::cout << "\nThis is the first time we got a deposit."
                 << "\nCreating a new account for user: "
-                << wallet_user_pubkey << std::endl;
+                << customer_pubkey << std::endl;
         }
 
         // This is the TF business logic:
         // Increment stored value by deposit value, extracted from txn payload
-        LOG4CXX_DEBUG(logger, "Storing value: " << value << " units");
-        stored_value += value;
+        customer_available_balance += request_amount;
+        LOG4CXX_DEBUG(logger, "Storing new available balance: "
+                               << customer_available_balance << " units");
 
-        stored_value_str = std::to_string(stored_value);
+        stored_balance_str = std::to_string(customer_available_balance);
 
         // Store the updated value in the user's unique state address
-        this->state->SetState(address, stored_value_str);
+        this->state->SetState(address, stored_balance_str);
     }
 
     // Handle SimpleWallet Withdraw action.
-    void doWithdraw(const std::string& wallet_user_pubkey,
-                    const uint32_t& value) {
-        auto address = this->MakeAddress(wallet_user_pubkey);
+    void doWithdraw(const std::string& customer_pubkey,
+                    const uint32_t& request_amount) {
+        auto address = this->MakeAddress(customer_pubkey);
 
         LOG4CXX_DEBUG(logger, "SimpleWalletApplicator::doWithdraw Key: "
-            << wallet_user_pubkey
+            << customer_pubkey
             << " Address: " << address);
 
-        uint32_t stored_value = 0;
-        std::string stored_value_str;
+        std::string stored_balance_str;
 
-        if (this->state->GetState(&stored_value_str, address)) {
-            stored_value = std::stoi(stored_value_str);
+        // Retrieve the balance available for customer account
+        uint32_t customer_available_balance = 0;
+        if (this->state->GetState(&stored_balance_str, address)) {
+            std::cout << "Available balance: " << stored_balance_str << "\n";
+            customer_available_balance = std::stoi(stored_balance_str);
         } else {
             std::string error = "Action was 'withdraw', but address"
-                " not found in state for Key: " + wallet_user_pubkey;
+                " not found in state for Key: " + customer_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
 
-        if (stored_value > 0 && stored_value >= value) {
-            stored_value -= value;
+        if (customer_available_balance > 0
+            && customer_available_balance >= request_amount) {
+            customer_available_balance -= request_amount;
         } else {
-            std::string error = "You don't have any sufficient balance"
-                " to withdraw." + wallet_user_pubkey;
+            std::string error = "You don't have sufficient balance"
+                " to withdraw." + customer_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
 
         // encode the value map back to string for storage.
-        LOG4CXX_DEBUG(logger, "Storing " << stored_value << " units");
-        stored_value_str = std::to_string(stored_value);
-        this->state->SetState(address, stored_value_str);
+        LOG4CXX_DEBUG(logger, "Storing new available balance:"
+                              << customer_available_balance << " units");
+        stored_balance_str = std::to_string(customer_available_balance);
+        this->state->SetState(address, stored_balance_str);
     }
 
     // Handle SimpleWallet Transfer action.
