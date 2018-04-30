@@ -193,9 +193,11 @@ def do_balance(args):
     data = client.balance()
 
     if data is not None:
-        print("\n{} has a net balance of = {}\n".format(args.customerName, data.decode()))
+        print("\n{} has a net balance of = {}\n".format(args.customerName,
+                                                        data.decode()))
     else:
-        raise SimpleWalletException("Data not found: {}".format(args.customerName))
+        raise SimpleWalletException("Data not found: {}"
+                                    .format(args.customerName))
 
 def do_transfer(args):
     keyfileFrom = _get_keyfile(args.customerNameFrom)
@@ -224,9 +226,14 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     elif args.command == 'balance':
         do_balance(args)
     elif args.command == 'transfer':
+        # Cannot deposit and withdraw from own account. noop.
+        if args.customerNameFrom == args.customerNameTo:
+            raise SimpleWalletException("Cannot transfer money to self: {}"
+                                        .format(args.customerNameFrom))
+
         do_transfer(args)
     else:
-        raise SimpleWalletException("invalid command: {}".format(args.command))
+        raise SimpleWalletException("Invalid command: {}".format(args.command))
 
 
 def main_wrapper():
