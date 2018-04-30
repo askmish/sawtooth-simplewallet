@@ -42,7 +42,7 @@ static const std::string SIMPLEWALLET_FAMILY = "simplewallet";
 
 // Helper function: To generate an SHA512 hash and return it as a hex
 // encoded string.
-static std::string SHA512(const std::string& message) {
+static std::string sha512(const std::string& message) {
     std::string digest;
     CryptoPP::SHA512 hash;
 
@@ -143,8 +143,8 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  private:
     // Make a 70-character(35-byte) address to store and retrieve the state
     std::string MakeAddress(const std::string& wallet_user_pubkey) {
-        return SHA512(SIMPLEWALLET_FAMILY).substr(0, 6) +
-            SHA512(wallet_user_pubkey).substr(0, 64);
+        return sha512(SIMPLEWALLET_FAMILY).substr(0, 6) +
+            sha512(wallet_user_pubkey).substr(0, 64);
     }
 
     // Handle the SimpleWallet Deposit action
@@ -300,7 +300,7 @@ class SimpleWalletHandler: public sawtooth::TransactionHandler {
 public:
     //Generating a namespace prefix in the default constructor
     SimpleWalletHandler() {
-        this->namespacePrefix = SHA512(SIMPLEWALLET_FAMILY).substr(0, 6);
+        this->namespacePrefix = sha512(SIMPLEWALLET_FAMILY).substr(0, 6);
         LOG4CXX_DEBUG(logger, "namespace:" << this->namespacePrefix);
     }
 
