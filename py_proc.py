@@ -59,49 +59,69 @@ class SWTransactionHandler(TransactionHandler):
         from_key = header.signer_public_key
 
         if operation == "deposit":
-            _make_deposit(context, amount, from_key)
+            self._make_deposit(context, amount, from_key)
 
         if operation == "withdraw":
-            _make_withdraw(context, amount, from_key)
+            self._make_withdraw(context, amount, from_key)
 
         if operation == "transfer":
-            _make_transfer(context, amount, to_key, from_key)
+            self._make_transfer(context, amount, to_key, from_key)
 
+    def _make_deposit(self, context, amount, from_key):
 
-def _make_deposit(self, context, amount, from_key):
+        wallet_key = self._get_wallet_key(from_key)
+        LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
 
-    wallet_key = _get_wallet_key(from_key)
-    LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
+        current_entry = context.get_state(wallet_key)
+        balance = str(current_entry)
+        new_balance = 0
 
-    current_entry = context.get_state(wallet_key)
-    balance = str(current_entry)
-    new_balance = 0
+        if balance == "":
+            LOGGER.info('No previous deposits, creating new deposit {} '.format(from_key))
+            new_balance = amount
+        else:
+            new_balance = amount + balance
 
-    if balance == "":
-        LOGGER.info('No previous deposits, creating new deposit {} '.format(from_key))
-        new_balance = amount
-    else:
-        new_balance = amount + balance
+        state_data = new_balance.encode()
 
-    state_data = new_balance.encode()
+        addresses = context.set_state(
+            {self._get_wallet_key(from_key): state_data})
 
-    addresses = context.set_state(
-        {_get_wallet_key(from_key): state_data})
+        if len(addresses) < 1:
+            raise InternalError("State Error")
 
-    if len(addresses) < 1:
-        raise InternalError("State Error")
+    def _make_withdraw(self, context, amount, from_key):
 
+        wallet_key = self._get_wallet_key(from_key)
+        LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
 
-def _make_withdraw(self, context, amount, from_key):
-    pass
+        current_entry = context.get_state(wallet_key)
+        balance = str(current_entry)
+        new_balance = 0
 
+        if balance == "":
+            LOGGER.info('No user with the key {} '.format(from_key))
+        else:
+            value = int(balance)
+            if value < amount:
+                LOGGER.info('Not enough money. Tha amount should be lesser or equal to {} '.format(value))
+            else:
+                new_balance = value - amount
 
-def _make_transfer(self, context, amount, to_key, from_key):
-    pass
+        LOGGER.info('Withdrawing {} '.format(amount))
+        state_data = new_balance.encode()
 
+        addresses = context.set_state(
+            {self._get_wallet_key(from_key): state_data})
 
-def _get_wallet_key(self, from_key):
-    return _hash(sw_namespace.encode('utf-8'))[0:6] + _hash(from_key.encode('utf-8'))[0:64]
+        if len(addresses) < 1:
+            raise InternalError("State Error")
+
+    def _make_transfer(self, context, amount, to_key, from_key):
+        pass
+
+    def _get_wallet_key(self, from_key):
+        return _hash(sw_namespace.encode('utf-8'))[0:6] + _hash(from_key.encode('utf-8'))[0:64]
 
 
 def main():
