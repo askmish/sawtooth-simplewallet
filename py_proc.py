@@ -27,11 +27,9 @@ FAMILY_NAME = "simplewallet"
 def _hash(data):
     return hashlib.sha512(data).hexdigest()
 
-
 sw_namespace = _hash(FAMILY_NAME.encode('utf-8'))[0:6]
 
-
-class SWTransactionHandler(TransactionHandler):
+class SimpleWalletTransactionHandler(TransactionHandler):
     def __init__(self, namespace_prefix):
         self._namespace_prefix = namespace_prefix
 
@@ -48,11 +46,8 @@ class SWTransactionHandler(TransactionHandler):
         return [self._namespace_prefix]
 
     def apply(self, transaction, context):
-
         header = transaction.header
-
         payload_list = transaction.payload.decode().split(",")
-
         operation = payload_list[0]
         amount = payload_list[1]
         to_key = payload_list[2]
@@ -60,20 +55,18 @@ class SWTransactionHandler(TransactionHandler):
 
         if operation == "deposit":
             self._make_deposit(context, amount, from_key)
-
-        if operation == "withdraw":
+        elif operation == "withdraw":
             self._make_withdraw(context, amount, from_key)
-
-        if operation == "transfer":
+        elif operation == "transfer":
             self._make_transfer(context, amount, to_key, from_key)
+        else:
+            LOGGER.info("Unhandled action. Operation should be deposit, withdraw or transfer")
 
     def _make_deposit(self, context, amount, from_key):
-
         wallet_key = self._get_wallet_key(from_key)
         LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
-
-        current_entry = context.get_state(wallet_key)
-        balance = str(current_entry)
+        current_entry = context.get_state([wallet_key])
+        balance = current_entry
         new_balance = 0
 
         if balance == "":
@@ -83,20 +76,16 @@ class SWTransactionHandler(TransactionHandler):
             new_balance = amount + balance
 
         state_data = new_balance.encode()
-
-        addresses = context.set_state(
-            {self._get_wallet_key(from_key): state_data})
+        addresses = context.set_state({wallet_key: state_data})
 
         if len(addresses) < 1:
             raise InternalError("State Error")
 
     def _make_withdraw(self, context, amount, from_key):
-
         wallet_key = self._get_wallet_key(from_key)
         LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
-
-        current_entry = context.get_state(wallet_key)
-        balance = str(current_entry)
+        current_entry = context.get_state([wallet_key])
+        balance = current_entry
         new_balance = 0
 
         if balance == "":
@@ -110,7 +99,6 @@ class SWTransactionHandler(TransactionHandler):
 
         LOGGER.info('Withdrawing {} '.format(amount))
         state_data = new_balance.encode()
-
         addresses = context.set_state(
             {self._get_wallet_key(from_key): state_data})
 
@@ -127,7 +115,7 @@ class SWTransactionHandler(TransactionHandler):
 def main():
     processor = TransactionProcessor(url='tcp://localhost:4004')
 
-    handler = SWTransactionHandler(sw_namespace)
+    handler = SimpleWalletTransactionHandler(sw_namespace)
 
     processor.add_handler(handler)
 
