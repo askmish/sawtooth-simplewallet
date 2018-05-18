@@ -1,0 +1,36 @@
+<div class="container-fluid" onload="hideNavbar()">
+    <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <!-- form start-->
+            <div class="wrapper">
+            <form class="form-container">
+                <div class="form-group">
+                    <div style="color: white;text-align:center; font-family:'Open Sans', sans-serif;font-weight: normal; font-size: 25px;">User ID</div>
+                    <br />
+                    <input type="text" class="form-control" id="loginId" placeholder="eg: alice">
+                </div>
+                <div class="col-xs-8 col-xs-offset-4 center-block "> 
+
+                    <center><button type="submit" class="btn btn-lg" style="color:white; align:center;" onclick="loginBtnClicked()">Login</button></center> 
+                </div>
+                </form>
+            </div>
+            <!-- form end-->
+	     <br />
+	     <br />
+	     <pre style="background-color: rgb(59,56,56); color:white; text-align:center; font-family:'Open Sans', sans-serif; font-weight:normal; font-size: 14px;"> Please refer     
+https://github.com/askmish/sawtooth-simplewallet/blob/master/README.md 
+    to know how to create the username.
+            </pre>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-12"> </div>
+    </div>
+</div>
+    <script>
+    $(window).on('load',function(){
+      $("#headings").hide();
+    });
+</script>  
+</script>
+<script src="../js/main.js"></script>

@@ -1,0 +1,30 @@
+<div class="container-fluid" id="depositPage">
+    <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <!-- form start-->
+            <div class="wrapper">
+            <form class="form-container">
+                <div class="form-group">
+                    <center><label style="color: white;text-align:center; font-family:'Open Sans', sans-serif;font-weight: normal; font-size: 25px;">Deposit Amount</label></center>    
+                    <br />
+                    <input type="number" class="form-control" id="depositAmt" placeholder="e.g. 100">
+                </div>
+                <center><button type="submit" style="color:white; align:center;" class="btn btn-lg" onclick="depositMoney()">Deposit</button></center>
+                </form>
+            </div>
+
+            <!-- form end-->
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+    </div>
+</div>
+<script src="../js/main.js"></script>
+<script>
+function myFunction() {
+   var element = document.getElementById("myDIV");
+   element.classList.add("mystyle");
+}
+
+    depositPageLoaded();
+</script>

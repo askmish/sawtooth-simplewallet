@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
+body{
+    background-color: black;
+}
+
+#headings{
+    margin:0px 0px;
+}
+
+.nav>li {
+    color: white;
+}
+.container-fluid{
+	margin-top:5px;
+}
+.navbar { height: 60px; padding-bottom:15px;}
+.navbar-right{ padding-top:15px;}
+
+.form-container{
+    background-color: rgb(59,56,56);
+    border:1px solid black;
+    padding: 50px 60px; 
+    margin-top: 20vh;
+}
+.nav-link{
+    font-size: 20px;
+}
+input[type=text] {
+    background-color: black;
+    color: white;
+    box-align:center;  
+    border:white solid 1px;
+    justify-content: center; 
+}
+
+input[type=number] {
+    background-color: black;
+    color: white;
+    box-align:center;  
+    border:white solid 1px;
+    justify-content: center; 
+}
+.jumbotron {
+    background-color: rgb(59,56,56);
+    margin: 8vh 25vh ;
+    height: 65vh;
+    text-align: center;
+}
+.btn{
+    background-color: rgb(118,113,113);
+    border: none;
+    justify-content: center; 
+    margin:0px auto;
+}
+nav{
+    background-color: rgb(56,56,56);
+}
+a{
+    color:rgb(118, 113, 113);
+    padding-right:20px;
+}
+
+.form-group{
+    padding: 5px 0px;
+}
+h1{
+    padding-top: 15px;
+    padding-left: 37px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 35px;
+    color: white;
+}
+
+h2{
+    padding-left: 10vh;
+    font-family: 'Cookie', cursive;
+    font-size: 50px;
+    color: black;
+}
+
+h3{
+    font-family: 'Open Sans', sans-serif,;
+    font-size: 40px;
+    text-transform: capitalize;
+    color: white;
+    padding-right: 10px;
+}
+
+
