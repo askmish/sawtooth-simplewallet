@@ -23,7 +23,6 @@ LOGGER = logging.getLogger(__name__)
 
 FAMILY_NAME = "simplewallet"
 
-
 def _hash(data):
     return hashlib.sha512(data).hexdigest()
 
@@ -133,7 +132,6 @@ class SimpleWalletTransactionHandler(TransactionHandler):
     def _get_wallet_key(self, from_key):
         return _hash(sw_namespace.encode('utf-8'))[0:6] + _hash(from_key.encode('utf-8'))[0:64]
 
-
 def main():
     processor = TransactionProcessor(url='tcp://localhost:4004')
 
@@ -142,7 +140,6 @@ def main():
     processor.add_handler(handler)
 
     processor.start()
-
 
 if __name__ == "__main__":
     main()
