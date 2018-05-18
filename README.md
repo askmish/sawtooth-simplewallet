@@ -19,6 +19,8 @@ The application is built in two parts:
 
 2. The Transaction Processor is written in C++11 using c++-sawtooth-sdk. It comes with its CMake files for build. The Transaction Processor is also available in Java and Python.
 
+3. The client is also written in Javascript using Node.JS. The app.js is the main javascript file from where the main function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in router/ folder. Running the yaml file we can begin execution of the code which runs on localhost:3000.
+
 # Usage
 
 This example uses docker-compose and Docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
