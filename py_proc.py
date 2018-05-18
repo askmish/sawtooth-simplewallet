@@ -71,9 +71,9 @@ class SimpleWalletTransactionHandler(TransactionHandler):
 
         if balance == "":
             LOGGER.info('No previous deposits, creating new deposit {} '.format(from_key))
-            new_balance = amount
+            new_balance = int(amount)
         else:
-            new_balance = amount + balance
+            new_balance = amount + int(balance)
 
         state_data = new_balance.encode()
         addresses = context.set_state({wallet_key: state_data})
@@ -85,17 +85,17 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         wallet_key = self._get_wallet_key(from_key)
         LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
         current_entry = context.get_state([wallet_key])
-        balance = current_entry
+        balance = current_entry[0]
         new_balance = 0
 
         if balance == "":
             LOGGER.info('No user with the key {} '.format(from_key))
         else:
             value = int(balance)
-            if value < amount:
+            if value < int(amount)
                 LOGGER.info('Not enough money. Tha amount should be lesser or equal to {} '.format(value))
             else:
-                new_balance = value - amount
+                new_balance = value - int(amount)
 
         LOGGER.info('Withdrawing {} '.format(amount))
         state_data = new_balance.encode()
@@ -112,8 +112,8 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         LOGGER.info('Got the to key {} and the to wallet key {} '.format(to_key, wallet_to_key))
         current_entry = context.get_state([wallet_key])
         current_entry_to = context.get_state([wallet_to_key])
-        balance = current_entry
-        balance_to = current_entry_to
+        balance = current_entry[0]
+        balance_to = current_entry_to[0]
         new_balance = 0
 
         if balance == "":
