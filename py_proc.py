@@ -35,7 +35,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
 
     @property
     def family_name(self):
-        return 'simplewallet'
+        return FAMILY_NAME
 
     @property
     def family_versions(self):
@@ -105,8 +105,30 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         if len(addresses) < 1:
             raise InternalError("State Error")
 
-    def _make_transfer(self, context, amount, to_key, from_key):
-        pass
+        def _make_transfer(self, context, transfer_amount, to_key, from_key):
+        wallet_key = self._get_wallet_key(from_key)
+        wallet_to_key = self._get_wallet_key(to_key)
+        LOGGER.info('Got the from key {} and the from wallet key {} '.format(from_key, wallet_key))
+        LOGGER.info('Got the to key {} and the to wallet key {} '.format(to_key, wallet_to_key))
+        current_entry = context.get_state([wallet_key])
+        current_entry_to = context.get_state([wallet_to_key])
+        balance = current_entry
+        balance_to = current_entry_to
+        new_balance = 0
+
+        if balance == "":
+            LOGGER.info('No user (debtor) with the key {} '.format(from_key))
+        if balance_to == "":
+            LOGGER.info('No user (creditor) with the key {} '.format(to_key))
+
+        debtor_balance = int(balance)
+        if debtor_balance < transfer_amount:
+            LOGGER.info('Not enough money. The amount should be less or equal to {} '.format(debtor_balance))
+        else:
+            LOGGER.info("Debitting balance with " + transfer_amount)
+            update_debtor_balance = debtor_balance - transfer_amount
+            state_data = update_debtor_balance.encode()
+            context.set_state({self._get_wallet_key(from_key): state_data})
 
     def _get_wallet_key(self, from_key):
         return _hash(sw_namespace.encode('utf-8'))[0:6] + _hash(from_key.encode('utf-8'))[0:64]
