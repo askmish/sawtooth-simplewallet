@@ -104,7 +104,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         if len(addresses) < 1:
             raise InternalError("State Error")
 
-        def _make_transfer(self, context, transfer_amount, to_key, from_key):
+    def _make_transfer(self, context, transfer_amount, to_key, from_key):
         wallet_key = self._get_wallet_key(from_key)
         wallet_to_key = self._get_wallet_key(to_key)
         LOGGER.info('Got the from key {} and the from wallet key {} '.format(from_key, wallet_key))
@@ -133,7 +133,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         return _hash(sw_namespace.encode('utf-8'))[0:6] + _hash(from_key.encode('utf-8'))[0:64]
 
 def main():
-    processor = TransactionProcessor(url='tcp://localhost:4004')
+    processor = TransactionProcessor(url='tcp://validator:4004')
 
     handler = SimpleWalletTransactionHandler(sw_namespace)
 
