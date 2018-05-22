@@ -13,7 +13,7 @@ A customer can:
 
 The customer is identified by a customer name and a corresponding public key. The value of the wallet, i.e. the balance, is stored at an address derived from hash of customer's public key and the transaction family namespace.
 
-# Components 
+# Components
 The application is built in two parts:
 1. The client application written in python, written in two parts: _client.py file representing the backend stuff and the _cli.py representing the frontend stuff. The example is built by using the setup.py file located in one directory level up.
 
@@ -45,7 +45,7 @@ Sample command usage:
 
 ```bash
 #Create a wallet
-sawtooth keygen jack #This creates the public/private keys for Jill, a pre-requisite for all commands following
+sawtooth keygen jack #This creates the public/private keys for Jack, a pre-requisite for all commands following
 
 simplewallet deposit 100 jack #This adds 100 units to Jack's account
 
