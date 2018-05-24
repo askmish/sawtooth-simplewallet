@@ -15,19 +15,19 @@ The customer is identified by a customer name and a corresponding public key. Th
 
 # Components
 The application is built in two parts:
-1. The client application written in python, written in two parts: _client.py file representing the backend stuff and the _cli.py representing the frontend stuff. The example is built by using the setup.py file located in one directory level up.
+1. The client application written in Python, written in two parts: _client.py file representing the backend stuff and the _cli.py representing the frontend stuff. The example is built by using the setup.py file located in one directory level up.
 
-2. The Transaction Processor is written in C++11 using c++-sawtooth-sdk. It comes with its CMake files for build.
+2. The Transaction Processor is written in C++11 using c++-sawtooth-sdk. It comes with its CMake files for build. The Transaction Processor is also available in Java and Python.
 
 # Usage
 
-This example uses docker-compose and docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
+This example uses docker-compose and Docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
 
 NOTE
 The preferred OS environment is Ubuntu 16.04.3 LTS x64.
-If you have windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
+If you have Windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for Windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
 
-Start the pre-built docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
+Start the pre-built Docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
 ```bash
 cd sawtooth-simplewallet
 docker-compose up
@@ -39,13 +39,13 @@ To launch the client, you could do this:
 docker exec -it simplewallet-client bash
 ```
 
-You can locate the right docker client container name using `docker ps`.
+You can locate the right Docker client container name using `docker ps`.
 
 Sample command usage:
 
 ```bash
 #Create a wallet
-sawtooth keygen jack #This creates the public/private keys for Jack, a pre-requisite for all commands following
+sawtooth keygen jack #This creates the public/private keys for Jack, a pre-requisite for the following commands
 
 simplewallet deposit 100 jack #This adds 100 units to Jack's account
 
@@ -54,7 +54,7 @@ simplewallet withdraw 50 jack #Withdraws 50 units from Jack's account
 simplewallet balance jack #Displays the balance left in Jack's account
 
 #Create 2nd wallet
-sawtooth keygen jill #This creates the public/private keys for Jill, a pre-requisite for all commands following
+sawtooth keygen jill #This creates the public/private keys for Jill, a pre-requisite for the following commands
 
 simplewallet deposit 100 jill #This adds 100 units to Jill's account
 
@@ -75,12 +75,12 @@ To build TP code of your preferred language and run the simplewallet example:
 docker-compose -f simplewallet-build-tp-<your_prog_language>.yaml up --build
 ```
 where,
- <your_prog_language> should be replaced with either `cxx` or `java`
+ <your_prog_language> should be replaced with either `cxx`, `java`, or `py`
 
 # Contributing
 Currently, we're looking for contributions and PRs for following:
- - TPs using JS, GO, .NET, Python sawtooth SDKs
- - Client apps in JS, GO, .NET, C++, JAVA
+ - TPs using GO and .NET sawtooth SDKs
+ - Client apps in GO, .NET, C++, and Java
 
 More ways you can contribute:
  - Bugs or issues: Report problems or defects found when working with simplewallet
