@@ -29,7 +29,7 @@ This example uses docker-compose and Docker containers. If you do not have these
 The preferred OS environment is Ubuntu 16.04.3 LTS x64.
 If you have Windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for Windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
 
-###Working with proxies
+### Working with proxies
 
 **For linux:**
 Follow the instructions in [sawtooth-core/BUILD.md](https://github.com/hyperledger/sawtooth-core/blob/master/BUILD.md#step-two-configure-proxy-optional)
