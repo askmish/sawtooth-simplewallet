@@ -78,7 +78,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
             balance = int(current_entry[0].data)
             new_balance = int(amount) + int(balance)
 
-        state_data = str(new_balance).encode()
+        state_data = str(new_balance).encode('utf-8')
         addresses = context.set_state({wallet_key: state_data})
 
         if len(addresses) < 1:
@@ -100,7 +100,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
                 new_balance = balance - int(amount)
 
         LOGGER.info('Withdrawing {} '.format(amount))
-        state_data = str(new_balance).encode()
+        state_data = str(new_balance).encode('utf-8')
         addresses = context.set_state(
             {self._get_wallet_key(from_key): state_data})
 
@@ -132,10 +132,10 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         else:
             LOGGER.info("Debitting balance with {}".format(transfer_amount))
             update_debtor_balance = balance - int(transfer_amount)
-            state_data = str(update_debtor_balance).encode()
+            state_data = str(update_debtor_balance).encode('utf-8')
             context.set_state({wallet_key: state_data})
             update_beneficiary_balance = balance_to + int(transfer_amount)
-            state_data = str(update_beneficiary_balance).encode()
+            state_data = str(update_beneficiary_balance).encode('utf-8')
             context.set_state({wallet_to_key: state_data})
 
     def _get_wallet_key(self, from_key):
