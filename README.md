@@ -1,17 +1,17 @@
 # sawtooth-simplewallet
 A simple sawtooth "simplewallet" transaction family example (processor + client)
 
-# simplewallet
+# Introduction
 
-This is a minimal example of a sawtooth 1.0 application. This example demonstrates, a common usecase, where a customer deposits/withdraws/transfers money from an account, based on public key.
+This is a minimal example of a sawtooth 1.0 application. This example demonstrates, a common usecase, where a customer deposits/withdraws/transfers money from a wallet account.
 
 A customer can:
-1. deposit money into his/her bank account.
-2. withdraw money from his/her bank account.
-3. check the balance in the account.
-4. transfer money from one bank account to another
+1. deposit money into his/her wallet account
+2. withdraw money from his/her wallet account
+3. check the balance in the wallet account
+4. transfer money from his/her wallet account to another
 
-The customer is identified by a customer name and a corresponding public key. The value of the wallet, i.e. the balance, is stored at an address derived from hash of customer's public key and the transaction family namespace.
+The customer is identified by a customer name and a corresponding public key. The wallet account balance, is stored at an address, derived from SHA 512 hash of customer's public key and the simplewallet transaction family namespace.
 
 # Components
 The application is built in two parts:
