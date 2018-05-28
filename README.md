@@ -29,6 +29,27 @@ NOTE
 The preferred OS environment is Ubuntu 16.04.3 LTS x64.
 If you have Windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for Windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
 
+###Working with proxies
+
+**For linux:**
+Follow the instructions in [sawtooth-core/BUILD.md](https://github.com/hyperledger/sawtooth-core/blob/master/BUILD.md#step-two-configure-proxy-optional)
+
+**For pre-Windows 10 versions** (using Docker Toolbox for Windows):
+Start the virtualbox host with:
+```
+   docker-machine rm default
+   docker-machine create -d virtualbox --engine-env HTTP_PROXY=<your_http_proxy> --engine-env HTTPS_PROXY=<your_https_proxy> --engine-env NO_PROXY=<your_no_proxy> default
+```   
+When you start Kitematic it will initially show an error, but just click "Use Virtualbox". 
+
+**For Windows 10** (using Docker for Windows):
+Right click on the Docker icon in the notification area, select Settings. Then click Proxies. Select "Manual proxy configuration" and enter the following then click Apply.
+```
+    Web Server (HTTP):         <your_http_proxy>
+    Secure Web Server (HTTPS): <your_https_proxy>
+    Bypass for these hosts:    <your_no_proxy>,localhost,127.0.0.1
+```
+
 Start the pre-built Docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
 ```bash
 cd sawtooth-simplewallet
