@@ -21,11 +21,11 @@ The application is built in two parts:
 
 3. The client is also written in Javascript using Node.JS. The app.js is the main javascript file from where the main function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in router/ folder. Running the yaml file we can begin execution of the code which runs on localhost:3000.
 
-# Usage
+# Pre-requisites
 
 This example uses docker-compose and Docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
 
-NOTE
+**NOTE**
 The preferred OS environment is Ubuntu 16.04.3 LTS x64.
 If you have Windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for Windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
 
@@ -49,6 +49,8 @@ Right click on the Docker icon in the notification area, select Settings. Then c
     Secure Web Server (HTTPS): <your_https_proxy>
     Bypass for these hosts:    <your_no_proxy>,localhost,127.0.0.1
 ```
+
+# Usage
 
 Start the pre-built Docker containers in docker-compose.yaml file, located in sawtooth-simplewallet directory:
 ```bash
