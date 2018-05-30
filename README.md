@@ -27,10 +27,14 @@ The client is also written in Javascript using node.js. The `app.js` is the main
 
 This example uses docker-compose and Docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
 
-**NOTE**
-
+**NOTE:**
 The preferred OS environment is Ubuntu 16.04.3 LTS x64. Although, other linux distributions which support Docker should work. 
 If you have Windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for Windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
+
+**NOTE:**
+The minimum version of Docker Engine necessary is 17.03.0-ce. Linux distributions often ship with older versions of Docker.
+
+[Here's a gist](https://gist.github.com/askmish/76e348e34d93fc22926d7d9379a0fd08) detailing steps on installing docker and docker-compose.
 
 ### Working with proxies
 
