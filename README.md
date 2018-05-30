@@ -21,7 +21,7 @@ The application is built in two parts:
 
 **NOTE**
 
-The client is also written in Javascript using node.js. The `app.js` is the main javascript file from where the `main` function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in router/ folder. Running the default docker-compose.yaml file launches the client, which is aceessible at `localhost:3000`.
+The client is also written in Javascript using node.js. The `app.js` is the main javascript file from where the `main` function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in router/ folder. Running the default docker-compose.yaml file launches the client, which is accessible at `localhost:3000`.
 
 # Pre-requisites
 
