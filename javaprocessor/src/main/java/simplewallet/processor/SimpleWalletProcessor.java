@@ -222,9 +222,9 @@ class SimpleWalletHandler implements TransactionHandler {
     *
     * @param transferAmount - the amount to transfer from 1st user's wallet to second users's wallet
     *
-    * @param userToKey - the public key of the user to whose wallet amount is to be tranferred
+    * @param userToKey - the public key of the user to whose wallet amount is to be transferred
     *
-    * @param userFromKey - the public key of the user from whose wallet amount is to be tranferred
+    * @param userFromKey - the public key of the user from whose wallet amount is to be transferred
     *
     * @returns - void
     *
