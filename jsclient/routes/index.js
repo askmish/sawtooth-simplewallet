@@ -59,7 +59,7 @@ router.get('/balance', function(req, res){
 //recieve data from login page and save it.
 router.post('/login', urlencodedParser, function(req, res){
     var userid = req.body.userId;
-    res.send({done:1, userId: userid, message: "User Succesfully Logged in as "+userid  });
+    res.send({done:1, userId: userid, message: "User Successfully Logged in as "+userid  });
 });
 
 //function to deposit amount in server
