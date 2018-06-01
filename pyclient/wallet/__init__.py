@@ -16,7 +16,6 @@
 __all__ = [
     'simplewallet_client',
     'simplewallet_cli',
-    'simplewallet_exceptions',
     'simplewallet_message_factory'
 ]
 
