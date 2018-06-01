@@ -25,7 +25,6 @@ import pkg_resources
 from colorlog import ColoredFormatter
 
 from wallet.simplewallet_client import SimpleWalletClient
-from wallet.simplewallet_exceptions import SimpleWalletException
 
 DISTRIBUTION_NAME = 'simplewallet'
 
@@ -97,18 +96,18 @@ def add_balance_parser(subparsers, parent_parser):
         'customerName',
         type=str,
         help='the name of customer to withdraw from')
-        
+
 def add_transfer_parser(subparsers, parent_parser):
     parser = subparsers.add_parser(
         'transfer',
         help='transfers balance from one account to the other',
         parents=[parent_parser])
-        
+
     parser.add_argument(
         'value',
         type=int,
         help='the amount to withdraw')
-        
+
     parser.add_argument(
         'customerNameFrom',
         type=str,
@@ -160,7 +159,7 @@ def _get_keyfile(customerName):
     key_dir = os.path.join(home, ".sawtooth", "keys")
 
     return '{}/{}.priv'.format(key_dir, customerName)
-    
+
 def _get_pubkeyfile(customerName):
     home = os.path.expanduser("~")
     key_dir = os.path.join(home, ".sawtooth", "keys")
@@ -184,7 +183,7 @@ def do_withdraw(args):
     response = client.withdraw(args.value)
 
     print("Response: {}".format(response))
-    
+
 def do_balance(args):
     keyfile = _get_keyfile(args.customerName)
 
@@ -196,13 +195,12 @@ def do_balance(args):
         print("\n{} has a net balance of = {}\n".format(args.customerName,
                                                         data.decode()))
     else:
-        raise SimpleWalletException("Data not found: {}"
-                                    .format(args.customerName))
+        raise Exception("Data not found: {}".format(args.customerName))
 
 def do_transfer(args):
     keyfileFrom = _get_keyfile(args.customerNameFrom)
     keyfileTo = _get_pubkeyfile(args.customerNameTo)
-    
+
     clientFrom = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfileFrom)
 
     response = clientFrom.transfer(args.value, keyfileTo)
@@ -228,18 +226,18 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     elif args.command == 'transfer':
         # Cannot deposit and withdraw from own account. noop.
         if args.customerNameFrom == args.customerNameTo:
-            raise SimpleWalletException("Cannot transfer money to self: {}"
+            raise Exception("Cannot transfer money to self: {}"
                                         .format(args.customerNameFrom))
 
         do_transfer(args)
     else:
-        raise SimpleWalletException("Invalid command: {}".format(args.command))
+        raise Exception("Invalid command: {}".format(args.command))
 
 
 def main_wrapper():
     try:
         main()
-    except SimpleWalletException as err:
+    except Exception as err:
         print("Error: {}".format(err), file=sys.stderr)
         sys.exit(1)
     except KeyboardInterrupt:
