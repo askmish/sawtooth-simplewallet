@@ -61,7 +61,7 @@ function logoutBtnClicked(){
 function depositMoney() {
     var userDetails = sessionStorage.getItem('userId');
     var amount = document.getElementById("depositAmt").value;
-    if (amount == 0 || amount.isEmpty()) {
+    if (amount.length === 0) {
         alert("Please enter some amount");
     } else {
         $.post('/deposit', { userId: userDetails, money: amount },
@@ -76,7 +76,7 @@ function depositMoney() {
 function withdrawMoney() {
     var userDetails = sessionStorage.getItem('userId');
     var amount = document.getElementById("withdrawAmt").value;
-    if (amount == 0 || amount.isEmpty()) {
+    if (amount.length === 0) {
         alert("please enter amount");
     } else {
         $.post('/withdraw', { userId: userDetails, money: amount },
@@ -92,13 +92,13 @@ function transferMoney() {
     var userDetails = sessionStorage.getItem('userId');
     var beneficiary = document.getElementById('beneficiaryUserId').value;
     var amount = document.getElementById("transferAmt").value;
-    if (amount == 0 || amount.isEmpty()) {
+    if (amount.length === 0) {
         alert("Please enter amount");
 	}
-    if(beneficiary.isEmpty()){
+    if(beneficiary.length === 0){
         alert("Please Enter the beneficiary"); 
 	}
-    if(!amount.isEmpty() && !beneficiary.isEmpty()){
+    if(amount.length != 0 && beneficiary.length != 0)){
         $.post('/transfer', { userId: userDetails, beneficiary: beneficiary, money: amount },
             function (data, textStatus, jqXHR) {
                 window.location.href="/balance";
