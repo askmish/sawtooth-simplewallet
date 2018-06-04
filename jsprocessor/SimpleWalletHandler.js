@@ -110,40 +110,40 @@ const makeWithdraw =(context, address, amount, user)  => (possibleAddressValues)
 }
 
 //function to make a transfer transaction
-const makeTransfer =(context, senderAddress, amount, recieverAddress)  => (possibleAddressValues) => {
+const makeTransfer =(context, senderAddress, amount, receiverAddress)  => (possibleAddressValues) => {
   if(amount <= MIN_VALUE){
     throw new InvalidTransaction('Amount is invalid')
   }
   let senderBalance
   let currentEntry = possibleAddressValues[senderAddress]
-  let currentEntryTo = possibleAddressValues[recieverAddress]
+  let currentEntryTo = possibleAddressValues[receiverAddress]
   let senderNewBalance = 0
-  let recieverBalance
-  let recieverNewBalance = 0
+  let receiverBalance
+  let receiverNewBalance = 0
   if(currentEntry == null || currentEntry == '')
     console.log("No user (debitor)")
   if(currentEntryTo == null || currentEntryTo == '')
     console.log("No user (Creditor)")
   senderBalance = decoder.decode(currentEntry)
   senderBalance = parseInt(senderBalance)
-  recieverBalance = decoder.decode(currentEntryTo)
-  recieverBalance = parseInt(recieverBalance)
+  receiverBalance = decoder.decode(currentEntryTo)
+  receiverBalance = parseInt(receiverBalance)
   if(isNaN(senderBalance))
     senderBalance = 0
-  if(isNaN(recieverBalance))
-    recieverBalance = 0
+  if(isNaN(receiverBalance))
+    receiverBalance = 0
   if(senderBalance < amount){
     throw new InvalidTransaction("Not enough money to perform transfer operation")
   }
   else{
     console.log("Debiting amount from the sender:"+amount)
     senderNewBalance = senderBalance -  amount
-    recieverNewBalance = recieverBalance + amount
+    receiverNewBalance = receiverBalance + amount
     let stateData = senderNewBalance.toString()
     _setEntry(context, senderAddress, stateData)
-    stateData = recieverNewBalance.toString()
-    console.log("Sender balance:"+senderNewBalance+", Reciever balance:"+recieverNewBalance)
-    return  _setEntry(context, recieverAddress, stateData)
+    stateData = receiverNewBalance.toString()
+    console.log("Sender balance:"+senderNewBalance+", Reciever balance:"+receiverNewBalance)
+    return  _setEntry(context, receiverAddress, stateData)
   }
 }
 
@@ -189,18 +189,18 @@ class SimpleWalletHandler extends TransactionHandler{
     let senderAddress = SW_NAMESPACE + _hash(userPublicKey).slice(-64)
     // this is the key obtained for the beneficiary in the payload , used only during transfer function
     let beneficiaryKey = update.toKey
-    let recieverAddress
+    let receiverAddress
     if(beneficiaryKey != undefined){
-      recieverAddress = SW_NAMESPACE + _hash(update.toKey).slice(-64)
+      receiverAddress = SW_NAMESPACE + _hash(update.toKey).slice(-64)
     }
     // Get the current state, for the key's address:
     let getPromise
     if (update.action == 'transfer')
-      getPromise = context.getState([senderAddress, recieverAddress])
+      getPromise = context.getState([senderAddress, receiverAddress])
     else
       getPromise = context.getState([senderAddress])
     let actionPromise = getPromise.then(
-      actionFn(context, senderAddress, amount, recieverAddress)
+      actionFn(context, senderAddress, amount, receiverAddress)
       )
     return actionPromise.then(addresses => {
       if (addresses.length === 0) {
