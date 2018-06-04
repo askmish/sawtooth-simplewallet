@@ -143,6 +143,8 @@ class SimpleWalletClient {
 		   	.then((responseJson) => {
                         	var data = responseJson.data;
                         	var amount = new Buffer(data, 'base64').toString();
+				if(amount == "")
+                                        amount = 0;
                         	return amount;
 		   	})
 		   	.catch((error) => {
