@@ -13,7 +13,6 @@
 # limitations under the License.
 # ------------------------------------------------------------------------------
 
-from __future__ import print_function
 import argparse
 import getpass
 import logging
@@ -237,9 +236,6 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
 def main_wrapper():
     try:
         main()
-    except Exception as err:
-        print("Error: {}".format(err), file=sys.stderr)
-        sys.exit(1)
     except KeyboardInterrupt:
         pass
     except SystemExit as err:

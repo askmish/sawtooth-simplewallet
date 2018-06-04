@@ -15,7 +15,6 @@
 
 import hashlib
 import base64
-from base64 import b64encode
 import time
 import requests
 import yaml
@@ -32,13 +31,13 @@ from sawtooth_sdk.protobuf.batch_pb2 import BatchHeader
 from sawtooth_sdk.protobuf.batch_pb2 import Batch
 
 # The Transaction Family Name
-FAMILY_NAME='simplewallet'
+FAMILY_NAME = 'simplewallet'
 
 def _hash(data):
     return hashlib.sha512(data).hexdigest()
 
 
-class SimpleWalletClient:
+class SimpleWalletClient(object):
     def __init__(self, baseUrl, keyFile=None):
 
         self._baseUrl = baseUrl
@@ -52,17 +51,17 @@ class SimpleWalletClient:
                 privateKeyStr = fd.read().strip()
         except OSError as err:
             raise Exception('Failed to read private key {}: {}'.format(
-                    keyFile, str(err)))
+                keyFile, str(err)))
 
         try:
             privateKey = Secp256k1PrivateKey.from_hex(privateKeyStr)
-        except ParseError as e:
-            raise Exception('Failed to load private key: {}'.format(str(e)))
+        except ParseError as err:
+            raise Exception('Failed to load private key: {}'.format(str(err)))
 
         self._signer = CryptoFactory(create_context('secp256k1')) \
             .new_signer(privateKey)
 
-        self._publicKey = self._signer.get_public_key().as_hex();
+        self._publicKey = self._signer.get_public_key().as_hex()
 
         self._address = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
             _hash(self._publicKey.encode('utf-8'))[0:64]
@@ -80,10 +79,9 @@ class SimpleWalletClient:
     def withdraw(self, value):
         try:
             retValue = self._wrap_and_send(
-            "withdraw",
-            value)
-            #raise Exception('Encountered an error during withdrawal {}'.format(retValue) )
-        except Exception as e:
+                "withdraw",
+                value)
+        except Exception:
             raise Exception('Encountered an error during withdrawal')
         return retValue
 
@@ -92,14 +90,14 @@ class SimpleWalletClient:
             with open(clientToKey) as fd:
                 publicKeyStr = fd.read().strip()
             retValue = self._wrap_and_send(
-            "transfer",
-            value,
-            publicKeyStr)
+                "transfer",
+                value,
+                publicKeyStr)
         except OSError as err:
             raise Exception('Failed to read public key {}: {}'.format(
-                    clientToKey, str(err)))
-        except Exception as e:
-            raise Exception('Encountered an error during transfer',e)
+                clientToKey, str(err)))
+        except Exception as err:
+            raise Exception('Encountered an error during transfer', err)
         return retValue
 
     def balance(self):
@@ -112,9 +110,9 @@ class SimpleWalletClient:
             return None
 
     def _send_to_restapi(self,
-                      suffix,
-                      data=None,
-                      contentType=None):
+                         suffix,
+                         data=None,
+                         contentType=None):
         if self._baseUrl.startswith("http://"):
             url = "{}/{}".format(self._baseUrl, suffix)
         else:
@@ -145,8 +143,8 @@ class SimpleWalletClient:
         return result.text
 
     def _wrap_and_send(self,
-                     action,
-                     *values):
+                       action,
+                       *values):
 
         # Generate a csv utf-8 encoded string as payload
         rawPayload = action
@@ -189,7 +187,7 @@ class SimpleWalletClient:
 
         transactionList = [transaction]
 
-        # Create a BatchHeader from TransactionList above
+        # Create a BatchHeader from transactionList above
         header = BatchHeader(
             signer_public_key=self._publicKey,
             transaction_ids=[txn.header_signature for txn in transactionList]
