@@ -15,7 +15,7 @@
 
 from sawtooth_processor_test.message_factory import MessageFactory
 
-class SimplewalletMessageFactory:
+class SimplewalletMessageFactory(object):
     def __init__(self, signer=None):
         self._factory = MessageFactory(
             family_name="simplewallet",
@@ -63,7 +63,7 @@ class SimplewalletMessageFactory:
         if value is not None:
             data = str(value).encode()
         else:
-            data = None 
+            data = None
         return self._factory.create_set_request({address: data})
 
     def create_get_response(self, value):
@@ -72,7 +72,7 @@ class SimplewalletMessageFactory:
         if value is not None:
             data = str(value).encode()
         else:
-            data = None 
+            data = None
         return self._factory.create_get_response({address: data})
 
     def create_set_response(self, game):

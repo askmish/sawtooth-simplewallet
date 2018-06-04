@@ -49,7 +49,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         payload_list = transaction.payload.decode().split(",")
         operation = payload_list[0]
         amount = payload_list[1]
-        
+
         from_key = header.signer_public_key
 
         LOGGER.info("Operation = "+ operation)
@@ -95,7 +95,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         else:
             balance = int(current_entry[0].data)
             if balance < int(amount):
-                raise InvalidTransaction('Not enough money. Tha amount should be lesser or equal to {} '.format(value))
+                raise InvalidTransaction('Not enough money. The amount should be lesser or equal to {} '.format(balance))
             else:
                 new_balance = balance - int(amount)
 
