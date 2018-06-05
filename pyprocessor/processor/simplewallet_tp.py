@@ -66,9 +66,10 @@ class SimpleWalletTransactionHandler(TransactionHandler):
             LOGGER.info("Unhandled action. Operation should be deposit, withdraw or transfer")
 
     def _make_deposit(self, context, amount, from_key):
-        wallet_key = self._get_wallet_key(from_key)
-        LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
-        current_entry = context.get_state([wallet_key])
+        wallet_address = self._get_wallet_address(from_key)
+        LOGGER.info('Got the key {} and the wallet address {} '.format(
+            from_key, wallet_address))
+        current_entry = context.get_state([wallet_address])
         new_balance = 0
 
         if current_entry == []:
@@ -79,15 +80,16 @@ class SimpleWalletTransactionHandler(TransactionHandler):
             new_balance = int(amount) + int(balance)
 
         state_data = str(new_balance).encode('utf-8')
-        addresses = context.set_state({wallet_key: state_data})
+        addresses = context.set_state({wallet_address: state_data})
 
         if len(addresses) < 1:
             raise InternalError("State Error")
 
     def _make_withdraw(self, context, amount, from_key):
-        wallet_key = self._get_wallet_key(from_key)
-        LOGGER.info('Got the key {} and the wallet key {} '.format(from_key, wallet_key))
-        current_entry = context.get_state([wallet_key])
+        wallet_address = self._get_wallet_address(from_key)
+        LOGGER.info('Got the key {} and the wallet address {} '.format(
+            from_key, wallet_address))
+        current_entry = context.get_state([wallet_address])
         new_balance = 0
 
         if current_entry == []:
@@ -102,7 +104,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         LOGGER.info('Withdrawing {} '.format(amount))
         state_data = str(new_balance).encode('utf-8')
         addresses = context.set_state(
-            {self._get_wallet_key(from_key): state_data})
+            {self._get_wallet_address(from_key): state_data})
 
         if len(addresses) < 1:
             raise InternalError("State Error")
@@ -112,12 +114,14 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         if transfer_amount <= 0:
             raise InvalidTransaction("The amount cannot be <= 0")
 
-        wallet_key = self._get_wallet_key(from_key)
-        wallet_to_key = self._get_wallet_key(to_key)
-        LOGGER.info('Got the from key {} and the from wallet key {} '.format(from_key, wallet_key))
-        LOGGER.info('Got the to key {} and the to wallet key {} '.format(to_key, wallet_to_key))
-        current_entry = context.get_state([wallet_key])
-        current_entry_to = context.get_state([wallet_to_key])
+        wallet_address = self._get_wallet_address(from_key)
+        wallet_to_address = self._get_wallet_address(to_key)
+        LOGGER.info('Got the from key {} and the from wallet address {} '.format(
+            from_key, wallet_address))
+        LOGGER.info('Got the to key {} and the to wallet address {} '.format(
+            to_key, wallet_to_address))
+        current_entry = context.get_state([wallet_address])
+        current_entry_to = context.get_state([wallet_to_address])
         new_balance = 0
 
         if current_entry == []:
@@ -133,12 +137,12 @@ class SimpleWalletTransactionHandler(TransactionHandler):
             LOGGER.info("Debitting balance with {}".format(transfer_amount))
             update_debtor_balance = balance - int(transfer_amount)
             state_data = str(update_debtor_balance).encode('utf-8')
-            context.set_state({wallet_key: state_data})
+            context.set_state({wallet_address: state_data})
             update_beneficiary_balance = balance_to + int(transfer_amount)
             state_data = str(update_beneficiary_balance).encode('utf-8')
-            context.set_state({wallet_to_key: state_data})
+            context.set_state({wallet_to_address: state_data})
 
-    def _get_wallet_key(self, from_key):
+    def _get_wallet_address(self, from_key):
         return _hash(FAMILY_NAME.encode('utf-8'))[0:6] + _hash(from_key.encode('utf-8'))[0:64]
 
 def setup_loggers():
