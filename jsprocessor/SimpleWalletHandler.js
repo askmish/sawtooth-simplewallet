@@ -169,7 +169,7 @@ class SimpleWalletHandler extends TransactionHandler{
     if (typeof amount !== "number" ||  amount <= MIN_VALUE) {
       throw new InvalidTransaction(`Value must be an integer ` + `no less than 1`)
     }
-        // Select the action to e performed
+    // Select the action to Be performed
     let actionFn
     if (update.action === 'deposit') { 
       actionFn = makeDeposit
