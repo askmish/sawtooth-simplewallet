@@ -14,8 +14,8 @@
 # -----------------------------------------------------------------------------
 
 __all__ = [
-    'xo_cli',
-    'xo_client',
-    'xo_exceptions'
+    'simplewallet_client',
+    'simplewallet_cli',
+    'simplewallet_message_factory'
 ]
 

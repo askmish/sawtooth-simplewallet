@@ -15,7 +15,6 @@
 
 import hashlib
 import base64
-from base64 import b64encode
 import time
 import requests
 import yaml
@@ -31,16 +30,14 @@ from sawtooth_sdk.protobuf.batch_pb2 import BatchList
 from sawtooth_sdk.protobuf.batch_pb2 import BatchHeader
 from sawtooth_sdk.protobuf.batch_pb2 import Batch
 
-from wallet.simplewallet_exceptions import SimpleWalletException
-
 # The Transaction Family Name
-FAMILY_NAME='simplewallet'
+FAMILY_NAME = 'simplewallet'
 
 def _hash(data):
     return hashlib.sha512(data).hexdigest()
 
 
-class SimpleWalletClient:
+class SimpleWalletClient(object):
     def __init__(self, baseUrl, keyFile=None):
 
         self._baseUrl = baseUrl
@@ -53,20 +50,18 @@ class SimpleWalletClient:
             with open(keyFile) as fd:
                 privateKeyStr = fd.read().strip()
         except OSError as err:
-            raise SimpleWalletException(
-                'Failed to read private key {}: {}'.format( \
-                    keyFile, str(err)))
+            raise Exception('Failed to read private key {}: {}'.format(
+                keyFile, str(err)))
 
         try:
             privateKey = Secp256k1PrivateKey.from_hex(privateKeyStr)
-        except ParseError as e:
-            raise SimpleWalletException( \
-                'Failed to load private key: {}'.format(str(e)))
+        except ParseError as err:
+            raise Exception('Failed to load private key: {}'.format(str(err)))
 
         self._signer = CryptoFactory(create_context('secp256k1')) \
             .new_signer(privateKey)
 
-        self._publicKey = self._signer.get_public_key().as_hex();
+        self._publicKey = self._signer.get_public_key().as_hex()
 
         self._address = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
             _hash(self._publicKey.encode('utf-8'))[0:64]
@@ -84,27 +79,25 @@ class SimpleWalletClient:
     def withdraw(self, value):
         try:
             retValue = self._wrap_and_send(
-            "withdraw",
-            value)
-            #raise SimpleWalletException('Encountered an error during withdrawal {}'.format(retValue) )
-        except Exception as e:
-            raise SimpleWalletException('Encountered an error during withdrawal')
+                "withdraw",
+                value)
+        except Exception:
+            raise Exception('Encountered an error during withdrawal')
         return retValue
-    
+
     def transfer(self, value, clientToKey):
         try:
             with open(clientToKey) as fd:
                 publicKeyStr = fd.read().strip()
             retValue = self._wrap_and_send(
-            "transfer",
-            value,
-            publicKeyStr)
+                "transfer",
+                value,
+                publicKeyStr)
         except OSError as err:
-            raise SimpleWalletException(
-                'Failed to read public key {}: {}'.format( \
-                    clientToKey, str(err)))
-        except Exception as e:
-            raise SimpleWalletException('Encountered an error during transfer',e)
+            raise Exception('Failed to read public key {}: {}'.format(
+                clientToKey, str(err)))
+        except Exception as err:
+            raise Exception('Encountered an error during transfer', err)
         return retValue
 
     def balance(self):
@@ -117,9 +110,9 @@ class SimpleWalletClient:
             return None
 
     def _send_to_restapi(self,
-                      suffix,
-                      data=None,
-                      contentType=None):
+                         suffix,
+                         data=None,
+                         contentType=None):
         if self._baseUrl.startswith("http://"):
             url = "{}/{}".format(self._baseUrl, suffix)
         else:
@@ -137,41 +130,41 @@ class SimpleWalletClient:
                 result = requests.get(url, headers=headers)
 
             if not result.ok:
-                raise SimpleWalletException("Error {}: {}".format(
+                raise Exception("Error {}: {}".format(
                     result.status_code, result.reason))
 
         except requests.ConnectionError as err:
-            raise SimpleWalletException(
+            raise Exception(
                 'Failed to connect to {}: {}'.format(url, str(err)))
 
         except BaseException as err:
-            raise SimpleWalletException(err)
+            raise Exception(err)
 
         return result.text
 
     def _wrap_and_send(self,
-                     action,
-                     *values):
+                       action,
+                       *values):
 
         # Generate a csv utf-8 encoded string as payload
         rawPayload = action
-        
+
         for val in values:
             rawPayload = ",".join([rawPayload, str(val)])
-                
+
         payload = rawPayload.encode()
 
         # Construct the address where we'll store our state
         address = self._address
         inputAddressList = [address]
         outputAddressList = [address]
-        
+
         if "transfer" == action:
             toAddress = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
             _hash(values[1].encode('utf-8'))[0:64]
             inputAddressList.append(toAddress)
             outputAddressList.append(toAddress)
-       
+
         # Create a TransactionHeader
         header = TransactionHeader(
             signer_public_key=self._publicKey,
@@ -194,7 +187,7 @@ class SimpleWalletClient:
 
         transactionList = [transaction]
 
-        # Create a BatchHeader from TransactionList above
+        # Create a BatchHeader from transactionList above
         header = BatchHeader(
             signer_public_key=self._publicKey,
             transaction_ids=[txn.header_signature for txn in transactionList]
