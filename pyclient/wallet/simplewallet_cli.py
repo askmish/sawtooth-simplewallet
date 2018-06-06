@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------------
+'''     
+Command line interface for the simplewallet transaction family.
+
+Parses command line arguments and passes it to the SimpleWalletClient class
+to process.
+''' 
 
 import argparse
 import getpass
@@ -54,6 +60,7 @@ def setup_loggers(verbose_level):
     logger.addHandler(create_console_handler(verbose_level))
 
 def add_deposit_parser(subparsers, parent_parser):
+    '''Define the "deposit" command line parsing.'''
     parser = subparsers.add_parser(
         'deposit',
         help='deposits a certain amount to an account',
@@ -70,6 +77,7 @@ def add_deposit_parser(subparsers, parent_parser):
         help='the name of customer to deposit to')
 
 def add_withdraw_parser(subparsers, parent_parser):
+    '''Define the "withdraw" command line parsing.'''
     parser = subparsers.add_parser(
         'withdraw',
         help='withdraws a certain amount from your account',
@@ -86,6 +94,7 @@ def add_withdraw_parser(subparsers, parent_parser):
         help='the name of customer to withdraw from')
 
 def add_balance_parser(subparsers, parent_parser):
+    '''Define the "balance" command line parsing.'''
     parser = subparsers.add_parser(
         'balance',
         help='shows balance in your account',
@@ -97,6 +106,7 @@ def add_balance_parser(subparsers, parent_parser):
         help='the name of customer to withdraw from')
 
 def add_transfer_parser(subparsers, parent_parser):
+    '''Define the "transfer" command line parsing.'''
     parser = subparsers.add_parser(
         'transfer',
         help='transfers balance from one account to the other',
@@ -118,6 +128,7 @@ def add_transfer_parser(subparsers, parent_parser):
         help='the name of customer to deposit to')
 
 def create_parent_parser(prog_name):
+    '''Define the -V/--version command line options.'''
     parent_parser = argparse.ArgumentParser(prog=prog_name, add_help=False)
 
     try:
@@ -136,6 +147,7 @@ def create_parent_parser(prog_name):
 
 
 def create_parser(prog_name):
+    '''Define the command line parsing for all the options and subcommands.'''
     parent_parser = create_parent_parser(prog_name)
 
     parser = argparse.ArgumentParser(
@@ -154,18 +166,21 @@ def create_parser(prog_name):
     return parser
 
 def _get_keyfile(customerName):
+    '''Get the private key for a customer.'''
     home = os.path.expanduser("~")
     key_dir = os.path.join(home, ".sawtooth", "keys")
 
     return '{}/{}.priv'.format(key_dir, customerName)
 
 def _get_pubkeyfile(customerName):
+    '''Get the public key for a customer.'''
     home = os.path.expanduser("~")
     key_dir = os.path.join(home, ".sawtooth", "keys")
 
     return '{}/{}.pub'.format(key_dir, customerName)
 
 def do_deposit(args):
+    '''Implements the "deposit" subcommand by calling the client class.'''
     keyfile = _get_keyfile(args.customerName)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
@@ -175,6 +190,7 @@ def do_deposit(args):
     print("Response: {}".format(response))
 
 def do_withdraw(args):
+    '''Implements the "withdraw" subcommand by calling the client class.'''
     keyfile = _get_keyfile(args.customerName)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
@@ -184,6 +200,7 @@ def do_withdraw(args):
     print("Response: {}".format(response))
 
 def do_balance(args):
+    '''Implements the "balance" subcommand by calling the client class.'''
     keyfile = _get_keyfile(args.customerName)
 
     client = SimpleWalletClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
@@ -197,6 +214,7 @@ def do_balance(args):
         raise Exception("Data not found: {}".format(args.customerName))
 
 def do_transfer(args):
+    '''Implements the "transfer" subcommand by calling the client class.'''
     keyfileFrom = _get_keyfile(args.customerNameFrom)
     keyfileTo = _get_pubkeyfile(args.customerNameTo)
 
@@ -206,6 +224,7 @@ def do_transfer(args):
     print("Response: {}".format(response))
 
 def main(prog_name=os.path.basename(sys.argv[0]), args=None):
+    '''Entry point function for the client CLI.'''
     if args is None:
         args = sys.argv[1:]
     parser = create_parser(prog_name)
@@ -243,3 +262,4 @@ def main_wrapper():
     except BaseException as err:
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
+
