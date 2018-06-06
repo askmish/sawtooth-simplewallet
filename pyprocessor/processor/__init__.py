@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # -----------------------------------------------------------------------------
+'''
+Define files for the transaction processor package in this directory.
+'''
 
 __all__ = [
     'simplewallet_tp'
 ]
+

@@ -10,6 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------------
+'''
+Transaction family class for simplewallet.
+'''
 
 import hashlib
 import logging
@@ -24,11 +27,20 @@ LOGGER = logging.getLogger(__name__)
 FAMILY_NAME = "simplewallet"
 
 def _hash(data):
+    '''Compute the SHA-512 hash and return the result as hex characters.'''
     return hashlib.sha512(data).hexdigest()
 
+# Prefix for simplewallet is the first six hex digits of SHA-512(TF name).
 sw_namespace = _hash(FAMILY_NAME.encode('utf-8'))[0:6]
 
 class SimpleWalletTransactionHandler(TransactionHandler):
+    '''                                                       
+    Transaction Processor class for the simplewallet transaction family.       
+                                                              
+    This with the validator using the accept/get/set functions.
+    It implements functions to deposit, withdraw, and transfer money.
+    '''
+
     def __init__(self, namespace_prefix):
         self._namespace_prefix = namespace_prefix
 
@@ -45,13 +57,22 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         return [self._namespace_prefix]
 
     def apply(self, transaction, context):
+        '''This implements the apply function for this transaction handler.
+                                                              
+           This function does most of the work for this class by processing
+           a single transaction for the simplewallet transaction family.   
+        '''                                                   
+        
+        # Get the payload and extract simplewallet-specific information.
         header = transaction.header
         payload_list = transaction.payload.decode().split(",")
         operation = payload_list[0]
         amount = payload_list[1]
 
+        # Get the public key sent from the client.
         from_key = header.signer_public_key
 
+        # Perform the operation.
         LOGGER.info("Operation = "+ operation)
 
         if operation == "deposit":
@@ -63,7 +84,8 @@ class SimpleWalletTransactionHandler(TransactionHandler):
                 to_key = payload_list[2]
             self._make_transfer(context, amount, to_key, from_key)
         else:
-            LOGGER.info("Unhandled action. Operation should be deposit, withdraw or transfer")
+            LOGGER.info("Unhandled action. " +
+                "Operation should be deposit, withdraw or transfer")
 
     def _make_deposit(self, context, amount, from_key):
         wallet_address = self._get_wallet_address(from_key)
@@ -73,7 +95,8 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         new_balance = 0
 
         if current_entry == []:
-            LOGGER.info('No previous deposits, creating new deposit {} '.format(from_key))
+            LOGGER.info('No previous deposits, creating new deposit {} '
+                .format(from_key))
             new_balance = int(amount)
         else:
             balance = int(current_entry[0].data)
@@ -97,7 +120,8 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         else:
             balance = int(current_entry[0].data)
             if balance < int(amount):
-                raise InvalidTransaction('Not enough money. The amount should be lesser or equal to {} '.format(balance))
+                raise InvalidTransaction('Not enough money. The amount ' +
+                    'should be lesser or equal to {} '.format(balance))
             else:
                 new_balance = balance - int(amount)
 
@@ -132,7 +156,8 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         balance = int(current_entry[0].data)
         balance_to = int(current_entry_to[0].data)
         if balance < transfer_amount:
-            raise InvalidTransaction('Not enough money. The amount should be less or equal to {} '.format(balance))
+            raise InvalidTransaction('Not enough money. ' +
+                'The amount should be less or equal to {} '.format(balance))
         else:
             LOGGER.info("Debitting balance with {}".format(transfer_amount))
             update_debtor_balance = balance - int(transfer_amount)
@@ -150,8 +175,10 @@ def setup_loggers():
     logging.getLogger().setLevel(logging.DEBUG)
 
 def main():
+    '''Entry-point function for the simplewallet transaction processor.'''
     setup_loggers()
     try:
+        # Register the transaction handler and start it.
         processor = TransactionProcessor(url='tcp://validator:4004')
 
         handler = SimpleWalletTransactionHandler(sw_namespace)
@@ -167,3 +194,4 @@ def main():
     except BaseException as err:
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
+

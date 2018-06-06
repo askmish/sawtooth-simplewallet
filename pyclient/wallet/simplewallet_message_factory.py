@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------------
+'''
+This file is used for automated testing of the simplewallet client.
+'''
 
 from sawtooth_processor_test.message_factory import MessageFactory
 

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------------
+'''
+This SimpleWalletClient class interfaces with Sawtooth through the REST API.
+'''
 
 import hashlib
 import base64
@@ -38,7 +41,16 @@ def _hash(data):
 
 
 class SimpleWalletClient(object):
+    '''Client simple wallet class.
+
+    This supports deposit, withdraw, transfer, and balance functions.
+    '''
+
     def __init__(self, baseUrl, keyFile=None):
+        '''Initialize the client class.
+
+           This is mainly getting the key pair and computing the address.
+        '''
 
         self._baseUrl = baseUrl
 
@@ -66,8 +78,8 @@ class SimpleWalletClient(object):
         self._address = _hash(FAMILY_NAME.encode('utf-8'))[0:6] + \
             _hash(self._publicKey.encode('utf-8'))[0:64]
 
-    # For each valid cli commands in _cli.py file
-    # Add methods to:
+    # For each valid cli command in _cli.py file,
+    # add methods to:
     # 1. Do any additional handling, if required
     # 2. Create a transaction and a batch
     # 2. Send to rest-api
@@ -113,6 +125,8 @@ class SimpleWalletClient(object):
                          suffix,
                          data=None,
                          contentType=None):
+        '''Send a REST command to the Validator via the REST API.'''
+
         if self._baseUrl.startswith("http://"):
             url = "{}/{}".format(self._baseUrl, suffix)
         else:
@@ -145,6 +159,10 @@ class SimpleWalletClient(object):
     def _wrap_and_send(self,
                        action,
                        *values):
+        '''Create a transaction, then wrap it in a batch.     
+                                                              
+           Even single transactions must be wrapped into a batch.
+        ''' 
 
         # Generate a csv utf-8 encoded string as payload
         rawPayload = action
@@ -207,3 +225,4 @@ class SimpleWalletClient(object):
             "batches",
             batch_list.SerializeToString(),
             'application/octet-stream')
+
