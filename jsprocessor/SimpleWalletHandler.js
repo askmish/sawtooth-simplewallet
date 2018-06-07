@@ -128,10 +128,6 @@ const makeTransfer =(context, senderAddress, amount, receiverAddress)  => (possi
   senderBalance = parseInt(senderBalance)
   receiverBalance = decoder.decode(currentEntryTo)
   receiverBalance = parseInt(receiverBalance)
-  if(isNaN(senderBalance))
-    senderBalance = 0
-  if(isNaN(receiverBalance))
-    receiverBalance = 0
   if(senderBalance < amount){
     throw new InvalidTransaction("Not enough money to perform transfer operation")
   }
