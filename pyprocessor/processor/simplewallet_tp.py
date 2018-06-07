@@ -134,7 +134,7 @@ class SimpleWalletTransactionHandler(TransactionHandler):
         if balance < transfer_amount:
             raise InvalidTransaction('Not enough money. The amount should be less or equal to {} '.format(balance))
         else:
-            LOGGER.info("Debitting balance with {}".format(transfer_amount))
+            LOGGER.info("Debiting balance with {}".format(transfer_amount))
             update_debtor_balance = balance - int(transfer_amount)
             state_data = str(update_debtor_balance).encode('utf-8')
             context.set_state({wallet_address: state_data})

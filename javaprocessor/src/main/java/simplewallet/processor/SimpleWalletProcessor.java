@@ -260,7 +260,7 @@ class SimpleWalletHandler implements TransactionHandler {
 	Map.Entry<String, ByteString> entry = new AbstractMap.SimpleEntry<String, ByteString>(walletKeyFrom,
 		ByteString.copyFromUtf8(updateBalance.toString()));
 	Collection<Map.Entry<String, ByteString>> newLedgerEntry = Collections.singletonList(entry);
-	logger.info("Debitting balance with " + transferAmount);
+	logger.info("Debiting balance with " + transferAmount);
 	stateInfo.setState(newLedgerEntry);
 	
 	//Crediting to creditor
