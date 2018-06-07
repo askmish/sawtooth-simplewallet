@@ -36,7 +36,7 @@ router.get('/home', function(req, res){
     res.render('homePage');
 });
 
-// Get Depsoit view
+// Get Deposit view
 router.get('/deposit',function(req, res){
     res.render('depositPage');
 })

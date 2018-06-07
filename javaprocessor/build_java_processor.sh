@@ -24,7 +24,7 @@ git clone https://github.com/hyperledger/sawtooth-core.git
 cd /project/sawtooth-core/
 git fetch --all
 git checkout 1-0
-echo "Building sawtooth java sdk dependecncy.."
+echo "Building sawtooth java sdk dependency.."
 cd sdk/java
 mvn clean install -Dhttp.proxyHost=$http_proxy_host \
     -Dhttp.proxyPort=$http_proxy_port \
