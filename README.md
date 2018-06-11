@@ -112,6 +112,39 @@ docker-compose -f simplewallet-build-tp-<your_prog_language>.yaml up --build
 where,
  <your_prog_language> should be replaced with either `cxx`, `java`, or `py`
 
+# Building and running on OS(without dockers)
+To run sawtooth-simplewallet without dockers, we'll have to use a Ubuntu 16.04 OS installation and compile simplewallet from sources. Below is a sample procedure for python TP/client:
+
+1. Install sawtooth on Ubuntu 16.04 LTS x64 machine and setup genesis block. Refer sawtooth app developer's guide [here](https://sawtooth.hyperledger.org/docs/core/releases/latest/app_developers_guide/ubuntu.html)
+   - Start the validator, rest-api and settings-tp in separate, new consoles:
+
+     ```bash
+     sudo -u sawtooth sawtooth-validator -vv
+     sudo -u sawtooth sawtooth-rest-api -vvv
+     sudo -u sawtooth settings-tp -vv
+     ```
+2. In a new console, clone the simplewallet repo:
+
+   `git clone https://github.com/askmish/sawtooth-simplewallet.git`
+3. `cd sawtooth-simplewallet`
+4. Modify two files:
+   - Create a new branch to start making changes
+   `git checkout -b nodocker`
+   - Edit file `pyclient/wallet/simplewallet_cli.py` and change `rest-api:8008` to `localhost:8008`
+   - Edit file `pyprocessor/processor/simplewallet_tp.py` and change `validator:4004` to `localhost:4004`
+5. Setup the simplewallet-tp.
+   - Follow the [`pyprocessor/Dockerfile`](https://github.com/askmish/sawtooth-simplewallet/blob/master/pyprocessor/Dockerfile)
+   - Install all the dependencies in the [first `RUN` line](https://github.com/askmish/sawtooth-simplewallet/blob/master/pyprocessor/Dockerfile#L18) in the Dockerfile
+   - Run the simplewallet-tp with `./pyprocessor/simplewallet-tp`
+6. Setup the client. Open a new console.
+   - Follow the [`pyclient/Dockerfile`](https://github.com/askmish/sawtooth-simplewallet/blob/master/pyclient/Dockerfile)
+   - Install all the dependencies in the [first `RUN` line](https://github.com/askmish/sawtooth-simplewallet/blob/master/pyclient/Dockerfile#L20) in the pyclient/Dockerfile
+   - Run the simplewallet client with `./pyclient/simplewallet` command. Refer [Usage](#Usage) section above, for examples.
+
+**NOTE** If you prefer using the simplewallet client without directory prefix, you could add the `pyclient` directory to your `PATH` environment variable, as shown below:
+
+`export PATH = $PATH:<absolute-path-to-your-cloned-sawtooth-simplewallet-dir>/pyclient"`
+
 # Contributing
 Currently, we're looking for contributions and PRs for following:
  - TPs using GO and .NET sawtooth SDKs
