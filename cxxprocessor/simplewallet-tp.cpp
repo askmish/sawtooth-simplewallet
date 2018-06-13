@@ -13,6 +13,12 @@
  limitations under the License.
 ------------------------------------------------------------------------------*/
 
+/*******************************************************************************
+ * simplewallet-tp
+ *
+ * Simple Wallet Transaction Processor written in C++.
+ ******************************************************************************/
+
 #include <ctype.h>
 #include <string.h>
 
@@ -40,9 +46,9 @@ using namespace log4cxx;
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger
     ("simplewallet"));
 
+static const std::string DEFAULT_VALIDATOR_URL = "tcp://validator:4004";
 static const std::string SIMPLEWALLET_FAMILY = "simplewallet";
-
-#define DEFAULT_VALIDATOR_URL "tcp://validator:4004"
+static const std::string TRANSACTION_FAMILY_VERSION = "1.0";
 
 // Helper function: To generate an SHA512 hash and return it as a hex
 // encoded string.
@@ -70,12 +76,13 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
     return tokens;
 }
 
-// Helper function: To extract Action str and value integer from given string
-// and beneficiary string if available
-void strToActionValueAndBeneficiary(const std::string& str,
-                                    std::string& action,
-                                    int32_t& value,
-                                    std::string& beneficiary) {
+// Helper function: extract CSV values from the payload.
+// For this transaction family, the payload is simply encoded as a CSV
+// with values for "action", "value", and optional "beneficiary".
+void payloadToActionValueAndBeneficiary(const std::string& str,
+                                        std::string& action,
+                                        int32_t& value,
+                                        std::string& beneficiary) {
      std::vector<std::string> vs = split(str, ',');
 
      if (vs.size() == 2) {
@@ -93,10 +100,10 @@ void strToActionValueAndBeneficiary(const std::string& str,
 }
 
 /*******************************************************************************
- * SimpleWalletApplicator
+ * SimpleWalletApplicator class
  *
- * Handles the processing of SimpleWallet transactions
- * This is the place where you implement your TF logic
+ * Handles the processing of SimpleWallet transactions, which are either
+ * "deposit", "withdraw", or "transfer" to a wallet.
  ******************************************************************************/
 class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
  public:
@@ -104,6 +111,8 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
         sawtooth::GlobalStateUPtr state) :
         TransactionApplicator(std::move(txn), std::move(state)) { }
 
+    // The Apply() function does most of the work for the transaction processor
+    // by processing a transaction for the simplewallet transaction family.
     void Apply() {
         std::cout << "SimpleWalletApplicator::Apply\n";
         // Extract user's wallet public key from TransactionHeader
@@ -117,11 +126,13 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
         int32_t amount;
         std::string beneficiary_pubkey;
 
-        // Extract the action and value from the payload string
-        strToActionValueAndBeneficiary(raw_data,
-                                       action,
-                                       amount,
-                                       beneficiary_pubkey);
+        // Extract values from the payload.
+        // For this transaction family, the payload is simply encoded
+        // as as a simple CSV (action, amount, beneficiary_pubkey).
+        payloadToActionValueAndBeneficiary(raw_data,
+                                           action,
+                                           amount,
+                                           beneficiary_pubkey);
 
         std::cout << "Got: " << action << " and " << amount << "\n";
 
@@ -151,13 +162,15 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 
  private:
     // Make a 70-character(35-byte) address to store and retrieve the state
+    // The first 6 characters is the TF prefix, which is the  
+    // first 6 characters of SHA-512("simplewallet"), 7e2664.
     std::string MakeAddress(const std::string& customer_pubkey) {
         return sha512(SIMPLEWALLET_FAMILY).substr(0, 6) +
             sha512(customer_pubkey).substr(0, 64);
     }
 
-    // Handle the SimpleWallet Deposit action
-    // overflow and underflow cases are ignored for this example
+    // Handle the SimpleWallet Deposit action.
+    // Overflow and underflow cases are ignored for this example
     void makeDeposit(const std::string& customer_pubkey,
                      const uint32_t& request_amount) {
         // Generate the unique state address based on user's wallet public key
@@ -183,7 +196,6 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
                 << customer_pubkey << std::endl;
         }
 
-        // This is the TF business logic:
         // Increment stored value by deposit value, extracted from txn payload
         customer_available_balance += request_amount;
         LOG4CXX_DEBUG(logger, "Storing new available balance: "
@@ -222,7 +234,7 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
             customer_available_balance -= request_amount;
         } else {
             std::string error = "You don't have sufficient balance"
-                " to withdraw." + customer_pubkey;
+                " to withdraw. " + customer_pubkey;
             throw sawtooth::InvalidTransaction(error);
         }
 
@@ -305,12 +317,12 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
 };
 
 /*******************************************************************************
- * SimpleWalletHandler
+ * SimpleWalletHandler Class
  *
  * This class will be registered as the transaction processor handler
  * with validator
  * It sets the namespaceprefix, versions, TF and types of transactions
- * that can be handled by this TP - via the apply method
+ * that can be handled by this TP - via the Apply method
  ******************************************************************************/
 class SimpleWalletHandler: public sawtooth::TransactionHandler {
  public:
@@ -325,7 +337,7 @@ class SimpleWalletHandler: public sawtooth::TransactionHandler {
     }
 
     std::list<std::string> versions() const {
-        return { "1.0" };
+        return { TRANSACTION_FAMILY_VERSION };
     }
 
     std::list<std::string> namespaces() const {
@@ -343,6 +355,7 @@ class SimpleWalletHandler: public sawtooth::TransactionHandler {
     std::string namespacePrefix;
 };
 
+// Entry point function to setup and run the transaction processor.
 int main(int argc, char** argv) {
     try {
         const std::string connectToValidatorUrl = DEFAULT_VALIDATOR_URL;
