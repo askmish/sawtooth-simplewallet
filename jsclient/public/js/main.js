@@ -27,25 +27,27 @@ window.addEventListener("load", function(event)
 	getUserDetails();
 });
 
-//Validate 
+//Validate
 function loginBtnClicked() {
     var userId = document.getElementById('loginId').value;
-    if(userId == ""){
+    if (userId == "") {
         alert("Please Enter User ID");
         window.location.href = '/login';
     } else {
         $.post('/login', { userId: userId },
         function (data, textStatus, jqXHR) {
-            if(data.done == 1){
+            if (data.done == 1) {
                 sessionStorage.clear();
-                sessionStorage.setItem("userId" , data.userId);  
-                alert(data.message); 
-                window.location.href = "/home"; 
-            }else{
-                alert(data.message); 
+                sessionStorage.setItem("userId" , data.userId);
+                // some delay before redirecting to homepage
+                // to allow sessionstorage to complete
+                setTimeout(null, 101);
+                alert(data.message);
+                window.location.href = "/home";
+            } else {
+                alert(data.message);
                 window.location.href = "/login";
             }
-            
         },'json');
     }
 }
@@ -98,7 +100,7 @@ function transferMoney() {
     if(beneficiary.length === 0){
         alert("Please Enter the beneficiary"); 
 	}
-    if(amount.length != 0 && beneficiary.length != 0)){
+    if(amount.length != 0 && beneficiary.length != 0) {
         $.post('/transfer', { userId: userDetails, beneficiary: beneficiary, money: amount },
             function (data, textStatus, jqXHR) {
                 window.location.href="/balance";
