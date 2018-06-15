@@ -19,9 +19,29 @@ The application is built in two parts:
 
 2. The Transaction Processor is written in C++11 using c++-sawtooth-sdk. It comes with its CMake files for build. The Transaction Processor is also available in Java and Python.
 
+------
+
 **NOTE**
 
-The client is also written in Javascript using node.js. The `app.js` is the main javascript file from where the `main` function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in router/ folder. Running the default docker-compose.yaml file launches the client, which is accessible at `localhost:3000`.
+The client is also written in Javascript using node.js. The `app.js` is the main javascript file from where the `main` function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in `router/` folder. Running the default `docker-compose.yaml` file or the `simplewallet-build-client-js.yaml` launches the client, which is accessible at `localhost:3000`. 
+
+How to use the simplewallet UI:
+
+1. Open bash shell in `simplewallet-client-js` container:
+
+`docker exec -it simplewallet-client-js bash`
+
+2. Create user accounts for jack and jill:
+
+`sawtooth keygen jack && sawtooth keygen jill`
+
+3. Open two new browser tabs and go to `localhost:3000` on each tab
+
+4. Login in one tab as `jack` and in other as `jill` 
+
+5. Start with an initial deposit for each user - jack and jill via the `Deposit` tab in the UI homepage
+
+------
 
 # Pre-requisites
 
