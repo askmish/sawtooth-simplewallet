@@ -36,7 +36,7 @@ services:
     environment:
       - 'http_proxy=${http_proxy}'
       - 'https_proxy=${https_proxy}'
-      - 'no_proxy=rest-api,validator,{no_proxy}'
+      - 'no_proxy=rest-api,validator,${no_proxy}'
     volumes:
       - '.:/project/simplewallet/'
     ports:
@@ -75,9 +75,9 @@ services:
     command: |
       bash -c "
         if [ ! -f /etc/sawtooth/keys/validator.priv ]; then
-          sawadm keygen && 
-          sawtooth keygen my_key && 
-          sawset genesis -k /root/.sawtooth/keys/my_key.priv && 
+          sawadm keygen &&
+          sawtooth keygen my_key &&
+          sawset genesis -k /root/.sawtooth/keys/my_key.priv &&
           sawadm genesis config-genesis.batch
         fi;
         sawtooth-validator -vvv \
