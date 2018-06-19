@@ -20,10 +20,8 @@ fi
 mkdir -p /project/
 current_dir=`pwd`
 cd /project
-git clone https://github.com/hyperledger/sawtooth-core.git
+git clone -b 1-0 --single-branch https://github.com/hyperledger/sawtooth-core.git
 cd /project/sawtooth-core/
-git fetch --all
-git checkout 1-0
 echo "Building sawtooth java sdk dependency.."
 cd sdk/java
 mvn clean install -Dhttp.proxyHost=$http_proxy_host \
