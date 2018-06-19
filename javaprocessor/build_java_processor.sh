@@ -28,7 +28,7 @@ mvn clean install -Dhttp.proxyHost=$http_proxy_host \
     -Dhttp.proxyPort=$http_proxy_port \
     -Dhttps.proxyHost=$https_proxy_host \
     -Dhttps.proxyPort=$https_proxy_port
-
+rm -rf /project/sawtooth-core
 echo "Build Simplewallet java transaction processor.."
 cd $current_dir
 mvn clean install \
