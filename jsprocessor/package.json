@@ -1,24 +1,14 @@
 {
-  "name": "sawtooth-simplewallet-processor",
-  "version": "0.0.0",
-  "description": "An SDK for interacting with the Hyperledger Sawtooth distributed ledger.",
-  "keywords": [
-    "hyperledger",
-    "blockchain",
-    "signing",
-    "crypto",
-    "protobuf"
-  ],
-  "homepage": "https://www.hyperledger.org/projects/sawtooth",
-  "repository": "https://github.com/hyperledger/sawtooth-core.git",
+  "name": "sawtooth-simplewallet-jsprocessor",
+  "version": "1.0.0",
+  "description": "A simplewallet transaction processor/family using sawtooth js sdk",
+  "homepage": "https://github.com/askmish/sawtooth-simplewallet",
+  "repository": "https://github.com/askmish/sawtooth-simplewallet.git",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js  tcp://validator:4004",
-    "test": "standard && node_modules/mocha/bin/mocha --recursive spec",
-    "compile_protobuf": "node compile_protobuf.js > protobuf/protobuf_bundle.json",
-    "prepublish": "npm run compile_protobuf && npm test"
+    "start": "node index.js tcp://validator:4004"
   },
-  "author": "",
+  "author": "Ashish K Mishra",
   "license": "Apache-2.0",
   "dependencies": {
     "protobufjs": "^6.7.3",
@@ -32,11 +22,5 @@
     "mocha": "^3.2.0",
     "standard": "^8.6.0",
     "underscore": "^1.8.3"
-  },
-  "standard": {
-    "globals": [
-      "describe",
-      "it"
-    ]
   }
 }
