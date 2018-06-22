@@ -78,7 +78,7 @@ services:
     expose:
       - 4004
     ports:
-      - '4040:4004'
+      - '4004:4004'
     command: |
       bash -c "
         if [ ! -f /etc/sawtooth/keys/validator.priv ]; then
