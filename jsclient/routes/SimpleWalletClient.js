@@ -97,7 +97,7 @@ class SimpleWalletClient {
       inputs: inputAddressList,
       outputs: outputAddressList,
       signerPublicKey: this.signer.getPublicKey().asHex(),
-      nonce: "" + new Date().getTime(),
+      nonce: "" + Math.random(),
       batcherPublicKey: this.signer.getPublicKey().asHex(),
       dependencies: [],
       payloadSha512: hash(payloadBytes),
