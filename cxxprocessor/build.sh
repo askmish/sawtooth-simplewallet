@@ -22,3 +22,4 @@ mkdir -p build
 cd build
 cmake ..
 make
+./bin/simplewallet-tp tcp://validator:4004

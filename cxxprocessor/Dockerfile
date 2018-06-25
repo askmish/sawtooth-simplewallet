@@ -42,4 +42,4 @@ EXPOSE 4004/tcp
 
 WORKDIR /project/simplewallet/cxxprocessor
 
-CMD bash -c "./build.sh && ./bin/simplewallet-tp"
+CMD bash -c "./build.sh"
