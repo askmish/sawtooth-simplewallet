@@ -18,7 +18,7 @@ This SimpleWalletClient class interfaces with Sawtooth through the REST API.
 
 import hashlib
 import base64
-import time
+import random
 import requests
 import yaml
 
@@ -193,7 +193,7 @@ class SimpleWalletClient(object):
             dependencies=[],
             payload_sha512=_hash(payload),
             batcher_public_key=self._publicKey,
-            nonce=time.time().hex().encode()
+            nonce=random.random().hex().encode()
         ).SerializeToString()
 
         # Create a Transaction from the header and payload above
