@@ -114,49 +114,58 @@ class SimpleWalletApplicator:  public sawtooth::TransactionApplicator {
     // The Apply() function does most of the work for the transaction processor
     // by processing a transaction for the simplewallet transaction family.
     void Apply() {
-        std::cout << "SimpleWalletApplicator::Apply\n";
-        // Extract user's wallet public key from TransactionHeader
-        std::string customer_pubkey = this->txn->header()->GetValue(
-            sawtooth::TransactionHeaderSignerPublicKey);
+        try {
+            std::cout << "SimpleWalletApplicator::Apply\n";
+            // Extract user's wallet public key from TransactionHeader
+            std::string customer_pubkey = this->txn->header()->GetValue(
+                sawtooth::TransactionHeaderSignerPublicKey);
 
-        // Extract the payload from Transaction as a string
-        const std::string& raw_data = this->txn->payload();
+            // Extract the payload from Transaction as a string
+            const std::string& raw_data = this->txn->payload();
 
-        std::string action;
-        int32_t amount;
-        std::string beneficiary_pubkey;
+            std::string action;
+            int32_t amount;
+            std::string beneficiary_pubkey;
 
-        // Extract values from the payload.
-        // For this transaction family, the payload is simply encoded
-        // as as a simple CSV (action, amount, beneficiary_pubkey).
-        payloadToActionValueAndBeneficiary(raw_data,
-                                           action,
-                                           amount,
-                                           beneficiary_pubkey);
+            // Extract values from the payload.
+            // For this transaction family, the payload is simply encoded
+            // as as a simple CSV (action, amount, beneficiary_pubkey).
+            payloadToActionValueAndBeneficiary(raw_data,
+                                               action,
+                                               amount,
+                                               beneficiary_pubkey);
 
-        std::cout << "Got: " << action << " and " << amount << "\n";
+            std::cout << "Got: " << action << " and " << amount << "\n";
 
-        // Validate the amount
-        if (amount <= 0) {
-            std::string error = "Invalid action: '" + action
-                                  + "' with amount <= 0";
-            throw sawtooth::InvalidTransaction(error);
-        }
+            // Validate the amount
+            if (amount <= 0) {
+                std::string error = "Invalid action: '" + action
+                                      + "' with amount <= 0";
+                throw sawtooth::InvalidTransaction(error);
+            }
 
-        // Choose what to do with value, based on action
-        if (action == "deposit") {
-            this->makeDeposit(customer_pubkey, amount);
-        } else if (action == "withdraw") {
-            this->doWithdraw(customer_pubkey, amount);
-        } else if (action == "transfer") {
-            std::cout << "Got beneficiary: " << beneficiary_pubkey << "\n";
-            this->doTransfer(customer_pubkey, amount, beneficiary_pubkey);
-        }
-        // Add your own action and a corresponding handler here
-        // Also add the actions in the client app as well
-        else {
-            std::string error = "Invalid action: '" + action + "'";
-            throw sawtooth::InvalidTransaction(error);
+            // Choose what to do with value, based on action
+            if (action == "deposit") {
+                this->makeDeposit(customer_pubkey, amount);
+            } else if (action == "withdraw") {
+                this->doWithdraw(customer_pubkey, amount);
+            } else if (action == "transfer") {
+                std::cout << "Got beneficiary: " << beneficiary_pubkey << "\n";
+                this->doTransfer(customer_pubkey, amount, beneficiary_pubkey);
+            }
+            // Add your own action and a corresponding handler here
+            // Also add the actions in the client app as well
+            else {
+                std::string error = "Invalid action: '" + action + "'";
+                throw sawtooth::InvalidTransaction(error);
+            }
+        } catch(sawtooth::InvalidTransaction& e) {
+                throw;
+        } catch(std::exception& e) {
+            std::cerr << "Unexpected exception exiting: " << std::endl;
+            std::cerr << e.what() << std::endl;
+        } catch(...) {
+            std::cerr << "Exiting due to unknown exception." << std::endl;
         }
     }
 
