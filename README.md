@@ -171,7 +171,7 @@ To run sawtooth-simplewallet without dockers, we'll have to use a Ubuntu 16.04 O
 
 # Contributing
 Currently, we're looking for contributions and PRs for following:
- - TPs using GO and .NET sawtooth SDKs
+ - TP using .NET sawtooth SDK
  - Client apps in GO, .NET, C++, and Java
 
 More ways you can contribute:
