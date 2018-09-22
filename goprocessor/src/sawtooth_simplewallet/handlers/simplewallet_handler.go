@@ -134,7 +134,7 @@ func (self SimpleWalletHandler) withdraw() error {
 		return err
 	}
 	balance := string(currentLedgerEntry[walletKey])
-	// getState() will return empty map if wallet key doesn't exist in state
+	// GetState() will return empty map if wallet key doesn't exist in state
 	if balance == "" {
 		return errors.New("Didn't find the wallet key associated with user key " + self.getUserFrom())
 	}
@@ -165,7 +165,7 @@ func (self SimpleWalletHandler) deposit() error {
 	}
 	balance := string(currentLedgerEntry[walletKey])
 	newBalance := 0
-	// getState() will return empty map if wallet key doesn't exist in state
+	// GetState() will return empty map if wallet key doesn't exist in state
 	if balance == "" {
 		logger.Info("This is the first time we got a deposit for user.")
 		logger.Info("Creating a new account for the user: " + self.getUserFrom())
