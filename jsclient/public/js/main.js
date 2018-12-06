@@ -28,7 +28,8 @@ window.addEventListener("load", function(event)
 });
 
 //Validate
-function loginBtnClicked() {
+function loginBtnClicked(event) {
+    event.preventDefault();
     var userId = document.getElementById('loginId').value;
     if (userId == "") {
         alert("Please Enter User ID");
