@@ -24,9 +24,9 @@ RUN echo "deb http://repo.sawtooth.me/ubuntu/ci xenial universe" >> /etc/apt/sou
  && apt-get install -y -q --no-install-recommends \
     apt-utils \
  && apt-get install -y -q \
+    build-essential \
     apt-transport-https \
     ca-certificates \
-    python3-sawtooth-cli \
     curl \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
