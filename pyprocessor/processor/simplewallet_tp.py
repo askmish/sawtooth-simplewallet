@@ -14,6 +14,8 @@
 Transaction family class for simplewallet.
 '''
 
+import traceback
+import sys
 import hashlib
 import logging
 
