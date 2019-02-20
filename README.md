@@ -169,6 +169,9 @@ To run sawtooth-simplewallet without dockers, we'll have to use a Ubuntu 16.04 O
 
 `export PATH = $PATH:<absolute-path-to-your-cloned-sawtooth-simplewallet-dir>/pyclient"`
 
+# Video Presentation
+A video presentation on YouTube uses this application as an example. It is "Hyperledger Sawtooth Application Development using 'SimpleWallet'". It is at https://youtu.be/4VUaZkwJdCc
+
 # Contributing
 Currently, we're looking for contributions and PRs for following:
  - TP using .NET sawtooth SDK
