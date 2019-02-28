@@ -17,20 +17,7 @@ then
     echo "Setting HTTPS proxy to ($https_proxy_host, $https_proxy_port)"
 fi
 
-mkdir -p /project/
-current_dir=`pwd`
-cd /project
-git clone -b 1-0 --single-branch https://github.com/hyperledger/sawtooth-core.git
-cd /project/sawtooth-core/
-echo "Building sawtooth java sdk dependency.."
-cd sdk/java
-mvn clean install -Dhttp.proxyHost=$http_proxy_host \
-    -Dhttp.proxyPort=$http_proxy_port \
-    -Dhttps.proxyHost=$https_proxy_host \
-    -Dhttps.proxyPort=$https_proxy_port
-rm -rf /project/sawtooth-core
 echo "Build Simplewallet java transaction processor.."
-cd $current_dir
 mvn clean install \
     -Dhttp.proxyHost=$http_proxy_host \
     -Dhttp.proxyPort=$http_proxy_port \
