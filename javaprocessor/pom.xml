@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- * Copyright 2017 Intel Corporation
+ * Copyright 2019 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,15 +74,14 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>sawtooth</groupId>
-            <artifactId>sdk</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.hyperledger.sawtooth</groupId>
+            <artifactId>sawtooth-sdk-transaction-processor</artifactId>
+            <version>v0.1.2</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.0.0</version>
+            <version>3.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
