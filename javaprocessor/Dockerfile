@@ -13,11 +13,13 @@
 # limitations under the License.
 # -----------------------------------------------------------------------------
 
-FROM ubuntu:xenial
+FROM ubuntu:bionic
+
+RUN apt-get update \
+ && apt-get install gnupg -y
 
 RUN \
- apt-get update \
- && apt-get install -y -q \
+ apt-get install -y -q \
     apt-transport-https \
     build-essential \
     ca-certificates \

@@ -13,13 +13,15 @@
 # limitations under the License.
 # -----------------------------------------------------------------------------
 
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
-RUN echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/ci xenial universe" >> /etc/apt/sources.list \
- && echo "deb http://archive.ubuntu.com/ubuntu bionic-backports universe" >> /etc/apt/sources.list \
+RUN apt-get update \
+ && apt-get install gnupg -y
+
+RUN echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/ci bionic universe" >> /etc/apt/sources.list \
+ && echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu bionic-backports universe" >> /etc/apt/sources.list \
  && (apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8AA7AF1F1091A5FD \
    || apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 8AA7AF1F1091A5FD) \
- && apt-get update \
  && apt-get install -y \
     build-essential \
     git \

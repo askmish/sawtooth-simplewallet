@@ -13,14 +13,16 @@
 # limitations under the License.
 # -----------------------------------------------------------------------------
 
-FROM ubuntu:xenial
+FROM ubuntu:bionic
+
+RUN apt-get update \
+ && apt-get install gnupg -y
 
 RUN \
- echo "deb http://repo.sawtooth.me/ubuntu/ci xenial universe" >> /etc/apt/sources.list \
+ echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/ci bionic universe" >> /etc/apt/sources.list \
  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8AA7AF1F1091A5FD \
- && echo "deb http://repo.sawtooth.me/ubuntu/nightly xenial universe" >> /etc/apt/sources.list \
+ && echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/nightly bionic universe" >> /etc/apt/sources.list \
  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 44FC67F19B2466EA \
- && apt-get update \
  && apt-get install -y -q \
     apt-transport-https \
     build-essential \

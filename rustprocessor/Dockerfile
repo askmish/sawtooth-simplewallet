@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN apt-get update \
+ && apt-get install gnupg -y
+
+RUN \
  && apt-get install -y \
  curl \
  gcc \
