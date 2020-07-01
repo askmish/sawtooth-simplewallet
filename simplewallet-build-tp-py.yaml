@@ -54,7 +54,7 @@ services:
 
   sawtooth-rest-api:
     container_name: rest-api
-    image: hyperledger/sawtooth-rest-api:1.1
+    image: hyperledger/sawtooth-rest-api:1.2
     expose:
       - 8008
     ports:
@@ -65,18 +65,21 @@ services:
       sawtooth-rest-api -vvv
         --connect tcp://validator:4004
         --bind sawtooth-rest-api:8008
-
+  
   settings-tp:
-    image: hyperledger/sawtooth-settings-tp:1.1
+    image: hyperledger/sawtooth-settings-tp:1.2
     depends_on:
       - validator
     command: settings-tp -vv --connect tcp://validator:4004
 
   validator:
     container_name: validator
-    image: hyperledger/sawtooth-validator:1.1
+    image: hyperledger/sawtooth-validator:1.2
     expose:
       - 4004
+      - 5050
+      - 8000
+      - 8800
     ports:
       - '4004:4004'
     command: |
@@ -85,7 +88,11 @@ services:
         sawadm keygen &&
         sawtooth keygen my_key &&
         sawset genesis -k /root/.sawtooth/keys/my_key.priv &&
-        sawadm genesis config-genesis.batch
+        sawset proposal create -k /root/.sawtooth/keys/my_key.priv \
+        sawtooth.consensus.algorithm.name=Devmode \
+        sawtooth.consensus.algorithm.version=0.1 \
+        -o config.batch
+        sawadm genesis config-genesis.batch config.batch
         fi;
         sawtooth-validator -vvv \
           --endpoint tcp://validator:8800 \
@@ -93,9 +100,10 @@ services:
           --bind network:tcp://eth0:8800 \
           --bind consensus:tcp://eth0:5050 \
       "
-
   devmode-engine:
-    image: hyperledger/sawtooth-devmode-engine-rust:1.1
+    image: hyperledger/sawtooth-devmode-engine-rust:1.2
+    expose:
+      - 5050
     ports:
       - '5050:5050'
     container_name: sawtooth-devmode-engine-rust-default

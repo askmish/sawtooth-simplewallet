@@ -58,7 +58,7 @@ services:
 
   sawtooth-rest-api:
     container_name: rest-api
-    image: hyperledger/sawtooth-rest-api:1.1
+    image: hyperledger/sawtooth-rest-api:1.2
     expose:
       - 8008
     ports:
@@ -71,14 +71,14 @@ services:
         --bind sawtooth-rest-api:8008
 
   settings-tp:
-    image: hyperledger/sawtooth-settings-tp:1.1
+    image: hyperledger/sawtooth-settings-tp:1.2
     depends_on:
       - validator
     command: settings-tp -vv --connect tcp://validator:4004
 
   validator:
     container_name: validator
-    image: hyperledger/sawtooth-validator:1.1
+    image: hyperledger/sawtooth-validator:1.2
     expose:
       - 4004
     ports:
@@ -99,7 +99,7 @@ services:
       "
 
   devmode-engine:
-    image: hyperledger/sawtooth-devmode-engine-rust:1.1
+    image: hyperledger/sawtooth-devmode-engine-rust:1.2
     ports:
       - '5050:5050'
     container_name: sawtooth-devmode-engine-rust-default

@@ -3,7 +3,7 @@ A simple sawtooth "simplewallet" transaction family example (processor + client)
 
 # Introduction
 
-This is a minimal example of a sawtooth 1.1 application. This example demonstrates, a common usecase, where a customer deposits/withdraws/transfers money from a wallet account.
+This is a minimal example of a sawtooth 1.2 application. This example demonstrates, a common usecase, where a customer deposits/withdraws/transfers money from a wallet account.
 
 A customer can:
 1. deposit money into his/her wallet account
@@ -19,40 +19,12 @@ The application is built in two parts:
 
 2. The Transaction Processor is written in C++11 using c++-sawtooth-sdk. It comes with its CMake files for build. The Transaction Processor is also available in Java and Python.
 
-------
-
-**JAVASCRIPT CLIENT NOTE**
-
-The client is also written in Javascript using node.js. The `app.js` is the main javascript file from where the `main` function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in `router/` folder. Running the default `docker-compose.yaml` file or the `simplewallet-build-client-js.yaml` launches the client, which is accessible at `localhost:3000`. 
-
-How to use the simplewallet UI:
-
-1. Build and start the Docker containers:
-
-`docker-compose -f simplewallet-build-client-js.yaml up`
-
-2. Open bash shell in `simplewallet-client-js` container:
-
-`docker exec -it simplewallet-client-js bash`
-
-3. Create user accounts for jack and jill:
-
-`sawtooth keygen jack && sawtooth keygen jill`
-
-4. Open two new browser tabs and go to `http://localhost:3000` on each tab
-
-5. Login in one tab as `jack` and in other as `jill` 
-
-6. Start with an initial deposit for each user - jack and jill via the `Deposit` tab in the UI homepage
-
-------
-
 # Pre-requisites
 
 This example uses docker-compose and Docker containers. If you do not have these installed please follow the instructions here: https://docs.docker.com/install/
 
 **NOTE:**
-The preferred OS environment is Ubuntu 16.04.3 LTS x64. Although, other linux distributions which support Docker should work. 
+The preferred OS environment is Ubuntu 16.04.3 LTS x64. Although, other linux distributions which support Docker should work.
 If you have Windows please install [Docker Toolbox for Windows](https://docs.docker.com/toolbox/toolbox_install_windows/) or [Docker for Windows](https://docs.docker.com/docker-for-windows/), based on your OS version.
 
 **NOTE:**
@@ -72,8 +44,8 @@ Start the virtualbox host with:
 ```
    docker-machine rm default
    docker-machine create -d virtualbox --engine-env HTTP_PROXY=<your_http_proxy> --engine-env HTTPS_PROXY=<your_https_proxy> --engine-env NO_PROXY=<your_no_proxy> default
-```   
-When you start Kitematic it will initially show an error, but just click "Use Virtualbox". 
+```
+When you start Kitematic it will initially show an error, but just click "Use Virtualbox".
 
 **For Windows 10** (using Docker for Windows):
 
@@ -136,8 +108,8 @@ docker-compose -f simplewallet-build-tp-<your_prog_language>.yaml up --build
 where,
  <your_prog_language> should be replaced with either `cxx`, `java`, or `py`
 
-# Building and running on OS(without dockers)
-To run sawtooth-simplewallet without dockers, we'll have to use a Ubuntu 16.04 OS installation and compile simplewallet from sources. Below is a sample procedure for python TP/client:
+# Building and running on OS (without Docker)
+To run sawtooth-simplewallet without Docker, we'll have to use a Ubuntu 16.04 OS installation and compile simplewallet from sources. Below is a sample procedure for python TP/client:
 
 1. Install sawtooth on Ubuntu 16.04 LTS x64 machine and setup genesis block. Refer sawtooth app developer's guide [here](https://sawtooth.hyperledger.org/docs/core/releases/latest/app_developers_guide/ubuntu.html)
    - Start the validator, rest-api and settings-tp in separate, new consoles:
@@ -171,6 +143,31 @@ To run sawtooth-simplewallet without dockers, we'll have to use a Ubuntu 16.04 O
 
 # Video Presentation
 A video presentation on YouTube uses this application as an example. It is "Hyperledger Sawtooth Application Development using 'SimpleWallet'". It is at https://youtu.be/4VUaZkwJdCc
+
+# Javascript Client
+
+The client is also written in Javascript using node.js. The `app.js` is the main javascript file from where the `main` function call occurs. Handlebars are used for templating, client related CSS and JavaScript code is written in public folder and server related files are written in `router/` folder. Running the default `docker-compose.yaml` file or the `simplewallet-build-client-js.yaml` launches the client, which is accessible at `localhost:3000`.
+
+How to use the simplewallet UI:
+
+1. Build and start the Docker containers:
+
+`docker-compose -f simplewallet-build-client-js.yaml up`
+
+2. Open bash shell in `simplewallet-client-js` container:
+
+`docker exec -it simplewallet-client-js bash`
+
+3. Create user accounts for jack and jill:
+
+`sawtooth keygen jack && sawtooth keygen jill`
+
+4. Open two new browser tabs and go to `http://localhost:3000` on each tab
+
+5. Login in one tab as `jack` and in other as `jill`
+
+6. Start with an initial deposit for each user - jack and jill via the `Deposit` tab in the UI homepage
+
 
 # Contributing
 Currently, we're looking for contributions and PRs for following:
