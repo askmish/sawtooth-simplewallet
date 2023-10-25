@@ -20,10 +20,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
  && apt-get install gnupg -y
 
-RUN echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/ci bionic universe" >> /etc/apt/sources.list \
+RUN apt-get update && apt-get install -y gnupg \
+ && echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/ci bionic universe" >> /etc/apt/sources.list \
  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8AA7AF1F1091A5FD \
  && echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/chime/stable bionic universe" >> /etc/apt/sources.list \
- && apt-get install -y -q --no-install-recommends \
+ && apt update && apt-get install -y -q --no-install-recommends \
     apt-utils \
  && apt-get install -y -q \
     ca-certificates \
@@ -31,7 +32,8 @@ RUN echo "deb [arch=amd64] http://repo.sawtooth.me/ubuntu/ci bionic universe" >>
     python3-sawtooth-cli \
     curl \
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* && apt-get clean \
+ && sawtooth keygen jack && sawtooth keygen jain
 
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt-get install -y nodejs
