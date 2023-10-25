@@ -117,7 +117,7 @@ function showBalance() {
     var userId = sessionStorage.getItem('userId');
     $.post('/balance', { userId: userId },
          function (data, textStatus, jqXHR) {
-              document.getElementById("balanceCheck").innerHTML ="Your balance is:" + "<br />" + data.balance; 
+              document.getElementById("balanceCheck").innerHTML ="Your balance is:" + "<br />" + data.balance | 0; 
             },
             'json'); 
 }
